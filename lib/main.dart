@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'theme/app_theme.dart';
 void main() {
   runApp(const MyCatholicDayApp());
 }
@@ -27,49 +27,8 @@ class MyCatholicDayApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'My Catholic Day',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: colorScheme,
-        scaffoldBackgroundColor: cream,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: navy,
-          foregroundColor: Colors.white,
-          centerTitle: true,
-          elevation: 0,
-        ),
-        cardTheme: CardThemeData(
-          color: Colors.white,
-          elevation: 1,
-          margin: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-        ),
-        navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: Colors.white,
-          indicatorColor: gold.withValues(alpha: 0.22),
-          labelTextStyle: WidgetStateProperty.resolveWith(
-            (states) => TextStyle(
-              color: states.contains(WidgetState.selected)
-                  ? navy
-                  : Colors.black54,
-              fontWeight: states.contains(WidgetState.selected)
-                  ? FontWeight.w700
-                  : FontWeight.w500,
-            ),
-          ),
-        ),
-        filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(
-            backgroundColor: burgundy,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 54),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
-            ),
-          ),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+
       home: const MainShell(),
     );
   }
