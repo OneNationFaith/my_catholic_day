@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-void main() {
+import 'screens/pray_screen.dart';
+import 'screens/todays_readings_screen.dart';
+import 'services/catholic_day_service.dart';
+import 'models/catholic_day.dart';
+import 'services/app_database.dart';
+import 'services/scripture_database.dart';
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+await AppDatabase.instance.database;
+await ScriptureDatabase.instance.database;
   runApp(const MyCatholicDayApp());
 }
 
@@ -14,15 +24,7 @@ class MyCatholicDayApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: navy,
-      brightness: Brightness.light,
-    ).copyWith(
-      primary: navy,
-      secondary: burgundy,
-      tertiary: gold,
-      surface: cream,
-    );
+ 
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -46,11 +48,7 @@ class _MainShellState extends State<MainShell> {
 
   static const List<Widget> _pages = [
     TodayPage(),
-    PlaceholderPage(
-      icon: Icons.volunteer_activism_outlined,
-      title: 'Pray',
-      message: 'Your prayer library will be built here.',
-    ),
+PrayScreen(),
     PlaceholderPage(
       icon: Icons.menu_book_outlined,
       title: 'Learn',
@@ -132,8 +130,23 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
-class TodayPage extends StatelessWidget {
+class TodayPage extends StatefulWidget {
   const TodayPage({super.key});
+
+  @override
+  State<TodayPage> createState() => _TodayPageState();
+}
+
+class _TodayPageState extends State<TodayPage> {
+  final CatholicDayService _service = const CatholicDayService();
+
+  late Future<CatholicDay> _dayFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _dayFuture = _service.getToday();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,63 +155,118 @@ class TodayPage extends StatelessWidget {
     final date = _formattedDate(now);
 
     return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 22, 20, 30),
-        children: [
-          Text(
-            '$greeting, Jeff',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  color: MyCatholicDayApp.navy,
-                  fontWeight: FontWeight.w800,
+      child: FutureBuilder<CatholicDay>(
+        future: _dayFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError || !snapshot.hasData) {
+            return const Center(
+              child: Text(
+                'Unable to load today’s Catholic calendar information.',
+              ),
+            );
+          }
+
+          final catholicDay = snapshot.data!;
+
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 30),
+            children: [
+              Text(
+                '$greeting, Jeff',
+                style:
+                    Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: MyCatholicDayApp.navy,
+                          fontWeight: FontWeight.w800,
+                        ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                date,
+                style:
+                    Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.black54,
+                        ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                catholicDay.celebration,
+                style:
+                    Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: MyCatholicDayApp.burgundy,
+                          fontWeight: FontWeight.w700,
+                        ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${catholicDay.seasonName} • '
+                '${catholicDay.colorName} • '
+                '${catholicDay.rosaryMysteriesName}',
+                style:
+                    Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.black54,
+                        ),
+              ),
+              if (catholicDay.isHolyDayOfObligation) ...[
+                const SizedBox(height: 6),
+                Text(
+                  'Holy Day of Obligation',
+                  style:
+                      Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: MyCatholicDayApp.burgundy,
+                            fontWeight: FontWeight.w700,
+                          ),
                 ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            date,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.black54,
-                ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Ordinary Time',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: MyCatholicDayApp.burgundy,
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-          const SizedBox(height: 24),
-          const DailyHeroCard(),
-          const SizedBox(height: 18),
-          const SectionCard(
-            icon: Icons.auto_stories_outlined,
-            title: "Today's Gospel",
-            subtitle: 'Matthew 5:13–16',
-            body:
-                '"You are the light of the world. A city set on a mountain cannot be hidden."',
-            buttonLabel: 'Read the Gospel',
-          ),
-          const SizedBox(height: 14),
-          const SectionCard(
-            icon: Icons.volunteer_activism_outlined,
-            title: "Today's Prayer",
-            subtitle: 'Morning Offering',
-            body:
-                'Begin your day by offering your prayers, works, joys, and sufferings to Christ.',
-            buttonLabel: 'Pray Now',
-          ),
-          const SizedBox(height: 14),
-          const SectionCard(
-            icon: Icons.person_outline,
-            title: 'Saint of the Day',
-            subtitle: 'Saint of the day coming soon',
-            body:
-                'This section will introduce the life, witness, and prayer of today’s saint.',
-            buttonLabel: 'Learn More',
-          ),
-          const SizedBox(height: 14),
-          const InvitationCard(),
-        ],
+              ],
+              const SizedBox(height: 24),
+              const DailyHeroCard(),
+              const SizedBox(height: 18),
+              SectionCard(
+                icon: Icons.auto_stories_outlined,
+                title: "Today's Readings",
+                subtitle: "Read today's Mass readings",
+                body:
+                    'Read the First Reading, Responsorial Psalm, Gospel, and more.',
+                buttonLabel: 'Open Readings',
+                onPressed: (context) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const TodaysReadingsScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 14),
+              const SectionCard(
+                icon: Icons.volunteer_activism_outlined,
+                title: "Today's Prayer",
+                subtitle: 'Morning Offering',
+                body:
+                    'Begin your day by offering your prayers, works, joys, and sufferings to Christ.',
+                buttonLabel: 'Pray Now',
+              ),
+              const SizedBox(height: 14),
+              SectionCard(
+                icon: Icons.person_outline,
+                title: 'Saint of the Day',
+                subtitle:
+                    catholicDay.saintName ?? 'No saint listed today',
+                body: catholicDay.saintName == null
+                    ? 'Today follows the regular liturgical calendar.'
+                    : 'Learn about ${catholicDay.saintName} and their witness to the faith.',
+                buttonLabel: 'Learn More',
+              ),
+              const SizedBox(height: 14),
+              const InvitationCard(),
+            ],
+          );
+        },
       ),
     );
   }
@@ -239,7 +307,6 @@ class TodayPage extends StatelessWidget {
         '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }
-
 class DailyHeroCard extends StatelessWidget {
   const DailyHeroCard({super.key});
 
@@ -306,6 +373,7 @@ class SectionCard extends StatelessWidget {
     required this.subtitle,
     required this.body,
     required this.buttonLabel,
+    this.onPressed,
   });
 
   final IconData icon;
@@ -313,6 +381,7 @@ class SectionCard extends StatelessWidget {
   final String subtitle;
   final String body;
   final String buttonLabel;
+  final void Function(BuildContext context)? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -343,20 +412,24 @@ class SectionCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style:
-                            Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: MyCatholicDayApp.navy,
-                                  fontWeight: FontWeight.w800,
-                                ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge
+                            ?.copyWith(
+                              color: MyCatholicDayApp.navy,
+                              fontWeight: FontWeight.w800,
+                            ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style:
-                            Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: MyCatholicDayApp.burgundy,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium
+                            ?.copyWith(
+                              color: MyCatholicDayApp.burgundy,
+                              fontWeight: FontWeight.w700,
+                            ),
                       ),
                     ],
                   ),
@@ -366,13 +439,16 @@ class SectionCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               body,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    height: 1.5,
-                  ),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(height: 1.5),
             ),
             const SizedBox(height: 12),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                onPressed?.call(context);
+              },
               child: Text(buttonLabel),
             ),
           ],
