@@ -46,3 +46,4 @@ flutter:
 
   assets:
     - assets/databases/webc.db
+    - assets/data/lectionary/

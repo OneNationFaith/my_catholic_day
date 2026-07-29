@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 1,
+  "year": 2026,
+  "days": [
+    {
+      "date": "2026-07-29",
+      "liturgicalDay": "Memorial of Saints Martha, Mary, and Lazarus",
+      "readings": [
+        {
+          "kind": "firstReading",
+          "title": "First Reading",
+          "displayReference": "Jeremiah 15:10, 16–21",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "JER",
+              "chapter": 15,
+              "startVerse": 10,
+              "endVerse": 10,
+              "displayVerseOffset": 0
+            },
+            {
+              "bookCode": "JER",
+              "chapter": 15,
+              "startVerse": 16,
+              "endVerse": 21,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "responsorialPsalm",
+          "title": "Responsorial Psalm",
+          "displayReference": "Psalm 59:2–3, 4, 10–11, 17, 18",
+          "response": "God is my refuge on the day of distress.",
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "PSA",
+              "chapter": 59,
+              "startVerse": 1,
+              "endVerse": 2,
+              "displayVerseOffset": 1
+            },
+            {
+              "bookCode": "PSA",
+              "chapter": 59,
+              "startVerse": 3,
+              "endVerse": 3,
+              "displayVerseOffset": 1
+            },
+            {
+              "bookCode": "PSA",
+              "chapter": 59,
+              "startVerse": 9,
+              "endVerse": 10,
+              "displayVerseOffset": 1
+            },
+            {
+              "bookCode": "PSA",
+              "chapter": 59,
+              "startVerse": 16,
+              "endVerse": 17,
+              "displayVerseOffset": 1
+            }
+          ]
+        },
+        {
+          "kind": "gospelAcclamation",
+          "title": "Gospel Acclamation",
+          "displayReference": "John 8:12",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "JHN",
+              "chapter": 8,
+              "startVerse": 12,
+              "endVerse": 12,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "gospel",
+          "title": "Gospel — Choice One",
+          "displayReference": "John 11:19–27",
+          "response": null,
+          "choiceGroup": "gospel",
+          "choiceLabel": "Choice One",
+          "ranges": [
+            {
+              "bookCode": "JHN",
+              "chapter": 11,
+              "startVerse": 19,
+              "endVerse": 27,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "gospel",
+          "title": "Gospel — Choice Two",
+          "displayReference": "Luke 10:38–42",
+          "response": null,
+          "choiceGroup": "gospel",
+          "choiceLabel": "Choice Two",
+          "ranges": [
+            {
+              "bookCode": "LUK",
+              "chapter": 10,
+              "startVerse": 38,
+              "endVerse": 42,
+              "displayVerseOffset": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
