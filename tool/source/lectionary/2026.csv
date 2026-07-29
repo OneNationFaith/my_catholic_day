@@ -1,0 +1,25 @@
+date,liturgicalDay,readingOrder,kind,title,displayReference,response,choiceGroup,choiceLabel,rangeOrder,bookCode,chapter,startVerse,endVerse,displayVerseOffset
+2026-07-28,Tuesday of the Seventeenth Week in Ordinary Time,1,firstReading,First Reading,Jeremiah 14:17–22,,,,1,JER,14,17,22,0
+2026-07-28,Tuesday of the Seventeenth Week in Ordinary Time,2,responsorialPsalm,Responsorial Psalm,"Psalm 79:8, 9, 11, 13","For the glory of your name, O Lord, deliver us.",,,1,PSA,79,8,8,0
+2026-07-28,Tuesday of the Seventeenth Week in Ordinary Time,2,responsorialPsalm,Responsorial Psalm,"Psalm 79:8, 9, 11, 13","For the glory of your name, O Lord, deliver us.",,,2,PSA,79,9,9,0
+2026-07-28,Tuesday of the Seventeenth Week in Ordinary Time,2,responsorialPsalm,Responsorial Psalm,"Psalm 79:8, 9, 11, 13","For the glory of your name, O Lord, deliver us.",,,3,PSA,79,11,11,0
+2026-07-28,Tuesday of the Seventeenth Week in Ordinary Time,2,responsorialPsalm,Responsorial Psalm,"Psalm 79:8, 9, 11, 13","For the glory of your name, O Lord, deliver us.",,,4,PSA,79,13,13,0
+2026-07-28,Tuesday of the Seventeenth Week in Ordinary Time,3,gospelAcclamation,Gospel Acclamation,Luke 8:11,,,,1,LUK,8,11,11,0
+2026-07-28,Tuesday of the Seventeenth Week in Ordinary Time,4,gospel,Gospel,Matthew 13:36–43,,,,1,MAT,13,36,43,0
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",1,firstReading,First Reading,"Jeremiah 15:10, 16–21",,,,1,JER,15,10,10,0
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",1,firstReading,First Reading,"Jeremiah 15:10, 16–21",,,,2,JER,15,16,21,0
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",2,responsorialPsalm,Responsorial Psalm,"Psalm 59:2–3, 4, 10–11, 17, 18",God is my refuge on the day of distress.,,,1,PSA,59,1,2,1
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",2,responsorialPsalm,Responsorial Psalm,"Psalm 59:2–3, 4, 10–11, 17, 18",God is my refuge on the day of distress.,,,2,PSA,59,3,3,1
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",2,responsorialPsalm,Responsorial Psalm,"Psalm 59:2–3, 4, 10–11, 17, 18",God is my refuge on the day of distress.,,,3,PSA,59,9,10,1
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",2,responsorialPsalm,Responsorial Psalm,"Psalm 59:2–3, 4, 10–11, 17, 18",God is my refuge on the day of distress.,,,4,PSA,59,16,17,1
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",3,gospelAcclamation,Gospel Acclamation,John 8:12,,,,1,JHN,8,12,12,0
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",4,gospel,Gospel — Choice One,John 11:19–27,,gospel,Choice One,1,JHN,11,19,27,0
+2026-07-29,"Memorial of Saints Martha, Mary, and Lazarus",5,gospel,Gospel — Choice Two,Luke 10:38–42,,gospel,Choice Two,1,LUK,10,38,42,0
+2026-08-02,Eighteenth Sunday in Ordinary Time,1,firstReading,First Reading,Isaiah 55:1–3,,,,1,ISA,55,1,3,0
+2026-08-02,Eighteenth Sunday in Ordinary Time,2,responsorialPsalm,Responsorial Psalm,"Psalm 145:8–9, 15–16, 17–18",The hand of the Lord feeds us; he answers all our needs.,,,1,PSA,145,8,9,0
+2026-08-02,Eighteenth Sunday in Ordinary Time,2,responsorialPsalm,Responsorial Psalm,"Psalm 145:8–9, 15–16, 17–18",The hand of the Lord feeds us; he answers all our needs.,,,2,PSA,145,15,16,0
+2026-08-02,Eighteenth Sunday in Ordinary Time,2,responsorialPsalm,Responsorial Psalm,"Psalm 145:8–9, 15–16, 17–18",The hand of the Lord feeds us; he answers all our needs.,,,3,PSA,145,17,18,0
+2026-08-02,Eighteenth Sunday in Ordinary Time,3,secondReading,Second Reading,"Romans 8:35, 37–39",,,,1,ROM,8,35,35,0
+2026-08-02,Eighteenth Sunday in Ordinary Time,3,secondReading,Second Reading,"Romans 8:35, 37–39",,,,2,ROM,8,37,39,0
+2026-08-02,Eighteenth Sunday in Ordinary Time,4,gospelAcclamation,Gospel Acclamation,Matthew 4:4b,,,,1,MAT,4,4,4,0
+2026-08-02,Eighteenth Sunday in Ordinary Time,5,gospel,Gospel,Matthew 14:13–21,,,,1,MAT,14,13,21,0
