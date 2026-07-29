@@ -3,6 +3,101 @@
   "year": 2026,
   "days": [
     {
+      "date": "2026-07-28",
+      "liturgicalDay": "Tuesday of the Seventeenth Week in Ordinary Time",
+      "readings": [
+        {
+          "kind": "firstReading",
+          "title": "First Reading",
+          "displayReference": "Jeremiah 14:17–22",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "JER",
+              "chapter": 14,
+              "startVerse": 17,
+              "endVerse": 22,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "responsorialPsalm",
+          "title": "Responsorial Psalm",
+          "displayReference": "Psalm 79:8, 9, 11, 13",
+          "response": "For the glory of your name, O Lord, deliver us.",
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "PSA",
+              "chapter": 79,
+              "startVerse": 8,
+              "endVerse": 8,
+              "displayVerseOffset": 0
+            },
+            {
+              "bookCode": "PSA",
+              "chapter": 79,
+              "startVerse": 9,
+              "endVerse": 9,
+              "displayVerseOffset": 0
+            },
+            {
+              "bookCode": "PSA",
+              "chapter": 79,
+              "startVerse": 11,
+              "endVerse": 11,
+              "displayVerseOffset": 0
+            },
+            {
+              "bookCode": "PSA",
+              "chapter": 79,
+              "startVerse": 13,
+              "endVerse": 13,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "gospelAcclamation",
+          "title": "Gospel Acclamation",
+          "displayReference": "Luke 8:11",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "LUK",
+              "chapter": 8,
+              "startVerse": 11,
+              "endVerse": 11,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "gospel",
+          "title": "Gospel",
+          "displayReference": "Matthew 13:36–43",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "MAT",
+              "chapter": 13,
+              "startVerse": 36,
+              "endVerse": 43,
+              "displayVerseOffset": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
       "date": "2026-07-29",
       "liturgicalDay": "Memorial of Saints Martha, Mary, and Lazarus",
       "readings": [
@@ -115,6 +210,118 @@
               "chapter": 10,
               "startVerse": 38,
               "endVerse": 42,
+              "displayVerseOffset": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "date": "2026-08-02",
+      "liturgicalDay": "Eighteenth Sunday in Ordinary Time",
+      "readings": [
+        {
+          "kind": "firstReading",
+          "title": "First Reading",
+          "displayReference": "Isaiah 55:1–3",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "ISA",
+              "chapter": 55,
+              "startVerse": 1,
+              "endVerse": 3,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "responsorialPsalm",
+          "title": "Responsorial Psalm",
+          "displayReference": "Psalm 145:8–9, 15–16, 17–18",
+          "response": "The hand of the Lord feeds us; he answers all our needs.",
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "PSA",
+              "chapter": 145,
+              "startVerse": 8,
+              "endVerse": 9,
+              "displayVerseOffset": 0
+            },
+            {
+              "bookCode": "PSA",
+              "chapter": 145,
+              "startVerse": 15,
+              "endVerse": 16,
+              "displayVerseOffset": 0
+            },
+            {
+              "bookCode": "PSA",
+              "chapter": 145,
+              "startVerse": 17,
+              "endVerse": 18,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "secondReading",
+          "title": "Second Reading",
+          "displayReference": "Romans 8:35, 37–39",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "ROM",
+              "chapter": 8,
+              "startVerse": 35,
+              "endVerse": 35,
+              "displayVerseOffset": 0
+            },
+            {
+              "bookCode": "ROM",
+              "chapter": 8,
+              "startVerse": 37,
+              "endVerse": 39,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "gospelAcclamation",
+          "title": "Gospel Acclamation",
+          "displayReference": "Matthew 4:4b",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "MAT",
+              "chapter": 4,
+              "startVerse": 4,
+              "endVerse": 4,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "gospel",
+          "title": "Gospel",
+          "displayReference": "Matthew 14:13–21",
+          "response": null,
+          "choiceGroup": null,
+          "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "MAT",
+              "chapter": 14,
+              "startVerse": 13,
+              "endVerse": 21,
               "displayVerseOffset": 0
             }
           ]
