@@ -36,6 +36,7 @@ class ScriptureRepository {
         AND bible_verses.chapter = ?
         AND bible_verses.verse_end >= ?
         AND bible_verses.verse_start <= ?
+        AND bible_verses.is_omitted = 0
       ORDER BY
         bible_verses.verse_start,
         bible_verses.verse_end

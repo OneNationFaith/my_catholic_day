@@ -1,0 +1,627 @@
+{
+  "schemaVersion": 1,
+  "year": 2026,
+  "days": {
+    "2026-01-25": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading",
+            "displayReference": "Isaiah 8:23—9:3",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "ISA",
+                "chapter": 9,
+                "startVerse": 1,
+                "endVerse": 1,
+                "displayVerseOffset": 22
+              },
+              {
+                "bookCode": "ISA",
+                "chapter": 9,
+                "startVerse": 2,
+                "endVerse": 4,
+                "displayVerseOffset": -1
+              }
+            ]
+          }
+        ],
+        "gospel": [
+          {
+            "kind": "gospel",
+            "title": "Gospel — Choice One",
+            "displayReference": "Matthew 4:12–23",
+            "response": null,
+            "choiceGroup": "gospel",
+            "choiceLabel": "Choice One",
+            "ranges": [
+              {
+                "bookCode": "MAT",
+                "chapter": 4,
+                "startVerse": 12,
+                "endVerse": 23,
+                "displayVerseOffset": 0
+              }
+            ]
+          },
+          {
+            "kind": "gospel",
+            "title": "Gospel — Choice Two",
+            "displayReference": "Matthew 4:12–17",
+            "response": null,
+            "choiceGroup": "gospel",
+            "choiceLabel": "Choice Two",
+            "ranges": [
+              {
+                "bookCode": "MAT",
+                "chapter": 4,
+                "startVerse": 12,
+                "endVerse": 17,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-02-02": {
+      "replaceReadings": {
+        "gospel": [
+          {
+            "kind": "gospel",
+            "title": "Gospel — Choice One",
+            "displayReference": "Luke 2:22–40",
+            "response": null,
+            "choiceGroup": "gospel",
+            "choiceLabel": "Choice One",
+            "ranges": [
+              {
+                "bookCode": "LUK",
+                "chapter": 2,
+                "startVerse": 22,
+                "endVerse": 40,
+                "displayVerseOffset": 0
+              }
+            ]
+          },
+          {
+            "kind": "gospel",
+            "title": "Gospel — Choice Two",
+            "displayReference": "Luke 2:22–32",
+            "response": null,
+            "choiceGroup": "gospel",
+            "choiceLabel": "Choice Two",
+            "ranges": [
+              {
+                "bookCode": "LUK",
+                "chapter": 2,
+                "startVerse": 22,
+                "endVerse": 32,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-02-22": {
+      "replaceReadings": {
+        "secondReading": [
+          {
+            "kind": "secondReading",
+            "title": "Second Reading — Choice One",
+            "displayReference": "Romans 5:12–19",
+            "response": null,
+            "choiceGroup": "secondReading",
+            "choiceLabel": "Choice One",
+            "ranges": [
+              {
+                "bookCode": "ROM",
+                "chapter": 5,
+                "startVerse": 12,
+                "endVerse": 19,
+                "displayVerseOffset": 0
+              }
+            ]
+          },
+          {
+            "kind": "secondReading",
+            "title": "Second Reading — Choice Two",
+            "displayReference": "Romans 5:12, 17–19",
+            "response": null,
+            "choiceGroup": "secondReading",
+            "choiceLabel": "Choice Two",
+            "ranges": [
+              {
+                "bookCode": "ROM",
+                "chapter": 5,
+                "startVerse": 12,
+                "endVerse": 12,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "ROM",
+                "chapter": 5,
+                "startVerse": 17,
+                "endVerse": 19,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-02-26": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading",
+            "displayReference": "Esther C:12, 14–16, 23–25",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "ESG",
+                "chapter": 4,
+                "startVerse": 29,
+                "endVerse": 29,
+                "displayVerseOffset": -17
+              },
+              {
+                "bookCode": "ESG",
+                "chapter": 4,
+                "startVerse": 31,
+                "endVerse": 33,
+                "displayVerseOffset": -17
+              },
+              {
+                "bookCode": "ESG",
+                "chapter": 4,
+                "startVerse": 40,
+                "endVerse": 42,
+                "displayVerseOffset": -17
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-03-13": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading",
+            "displayReference": "Hosea 14:2–10",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "HOS",
+                "chapter": 14,
+                "startVerse": 1,
+                "endVerse": 9,
+                "displayVerseOffset": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-03-14": {
+      "replaceReadings": {
+        "responsorialPsalm": [
+          {
+            "kind": "responsorialPsalm",
+            "title": "Responsorial Psalm",
+            "displayReference": "Psalm 51:3–4, 18–19, 20–21ab",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "PSA",
+                "chapter": 51,
+                "startVerse": 1,
+                "endVerse": 2,
+                "displayVerseOffset": 2
+              },
+              {
+                "bookCode": "PSA",
+                "chapter": 51,
+                "startVerse": 16,
+                "endVerse": 17,
+                "displayVerseOffset": 2
+              },
+              {
+                "bookCode": "PSA",
+                "chapter": 51,
+                "startVerse": 18,
+                "endVerse": 19,
+                "displayVerseOffset": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-03-23": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading — Choice One",
+            "displayReference": "Daniel 13:1–9, 15–17, 19–30, 33–62",
+            "response": null,
+            "choiceGroup": "firstReading",
+            "choiceLabel": "Choice One",
+            "ranges": [
+              {
+                "bookCode": "DAG",
+                "chapter": 13,
+                "startVerse": 1,
+                "endVerse": 9,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "DAG",
+                "chapter": 13,
+                "startVerse": 15,
+                "endVerse": 17,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "DAG",
+                "chapter": 13,
+                "startVerse": 19,
+                "endVerse": 30,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "DAG",
+                "chapter": 13,
+                "startVerse": 33,
+                "endVerse": 62,
+                "displayVerseOffset": 0
+              }
+            ]
+          },
+          {
+            "kind": "firstReading",
+            "title": "First Reading — Choice Two",
+            "displayReference": "Daniel 13:41c–62",
+            "response": null,
+            "choiceGroup": "firstReading",
+            "choiceLabel": "Choice Two",
+            "ranges": [
+              {
+                "bookCode": "DAG",
+                "chapter": 13,
+                "startVerse": 41,
+                "endVerse": 62,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-04-26": {
+      "replaceReadings": {
+        "responsorialPsalm": [
+          {
+            "kind": "responsorialPsalm",
+            "title": "Responsorial Psalm",
+            "displayReference": "Psalm 23:1–3a, 3b–4, 5, 6",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "PSA",
+                "chapter": 23,
+                "startVerse": 1,
+                "endVerse": 4,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "PSA",
+                "chapter": 23,
+                "startVerse": 5,
+                "endVerse": 5,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "PSA",
+                "chapter": 23,
+                "startVerse": 6,
+                "endVerse": 6,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-07-10": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading",
+            "displayReference": "Hosea 14:2–10",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "HOS",
+                "chapter": 14,
+                "startVerse": 1,
+                "endVerse": 9,
+                "displayVerseOffset": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-08-15": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading",
+            "displayReference": "Revelation 11:19a; 12:1–6a, 10ab",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "REV",
+                "chapter": 11,
+                "startVerse": 19,
+                "endVerse": 19,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "REV",
+                "chapter": 12,
+                "startVerse": 1,
+                "endVerse": 6,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "REV",
+                "chapter": 12,
+                "startVerse": 10,
+                "endVerse": 10,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-11-04": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading",
+            "displayReference": "Philippians 2:12–18",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "PHP",
+                "chapter": 2,
+                "startVerse": 12,
+                "endVerse": 18,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-11-21": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading",
+            "displayReference": "Revelation 11:4–12",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "REV",
+                "chapter": 11,
+                "startVerse": 4,
+                "endVerse": 12,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-12-06": {
+      "replaceReadings": {
+        "responsorialPsalm": [
+          {
+            "kind": "responsorialPsalm",
+            "title": "Responsorial Psalm",
+            "displayReference": "Psalm 85:9–10, 11–12, 13–14",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "PSA",
+                "chapter": 85,
+                "startVerse": 8,
+                "endVerse": 9,
+                "displayVerseOffset": 1
+              },
+              {
+                "bookCode": "PSA",
+                "chapter": 85,
+                "startVerse": 10,
+                "endVerse": 11,
+                "displayVerseOffset": 1
+              },
+              {
+                "bookCode": "PSA",
+                "chapter": 85,
+                "startVerse": 12,
+                "endVerse": 13,
+                "displayVerseOffset": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-12-12": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading — Choice One",
+            "displayReference": "Zechariah 2:14–17",
+            "response": null,
+            "choiceGroup": "firstReading",
+            "choiceLabel": "Choice One",
+            "ranges": [
+              {
+                "bookCode": "ZEC",
+                "chapter": 2,
+                "startVerse": 10,
+                "endVerse": 13,
+                "displayVerseOffset": 4
+              }
+            ]
+          },
+          {
+            "kind": "firstReading",
+            "title": "First Reading — Choice Two",
+            "displayReference": "Revelation 11:19a; 12:1–6a, 10ab",
+            "response": null,
+            "choiceGroup": "firstReading",
+            "choiceLabel": "Choice Two",
+            "ranges": [
+              {
+                "bookCode": "REV",
+                "chapter": 11,
+                "startVerse": 19,
+                "endVerse": 19,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "REV",
+                "chapter": 12,
+                "startVerse": 1,
+                "endVerse": 6,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "REV",
+                "chapter": 12,
+                "startVerse": 10,
+                "endVerse": 10,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-12-20": {
+      "replaceReadings": {
+        "secondReading": [
+          {
+            "kind": "secondReading",
+            "title": "Second Reading",
+            "displayReference": "Romans 16:25–27",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "ROM",
+                "chapter": 14,
+                "startVerse": 24,
+                "endVerse": 26,
+                "displayVerseOffset": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-12-23": {
+      "replaceReadings": {
+        "firstReading": [
+          {
+            "kind": "firstReading",
+            "title": "First Reading",
+            "displayReference": "Malachi 3:1–4, 23–24",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "MAL",
+                "chapter": 3,
+                "startVerse": 1,
+                "endVerse": 4,
+                "displayVerseOffset": 0
+              },
+              {
+                "bookCode": "MAL",
+                "chapter": 4,
+                "startVerse": 5,
+                "endVerse": 6,
+                "displayVerseOffset": 18
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2026-09-08": {
+      "replaceReadings": {
+        "responsorialPsalm": [
+          {
+            "kind": "responsorialPsalm",
+            "title": "Responsorial Psalm",
+            "displayReference": "Psalm 13:6ab, 6c",
+            "response": null,
+            "choiceGroup": null,
+            "choiceLabel": null,
+            "ranges": [
+              {
+                "bookCode": "PSA",
+                "chapter": 13,
+                "startVerse": 6,
+                "endVerse": 6,
+                "displayVerseOffset": 0
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

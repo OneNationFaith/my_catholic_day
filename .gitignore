@@ -45,3 +45,8 @@ app.*.map.json
 /android/app/release
 # Downloaded WEBC source files
 /tool/source/webc/
+# Generated lectionary candidate files
+/tool/source/lectionary/*_fetch_report.txt
+/tool/source/lectionary/*_fetched.csv
+/tool/source/lectionary/*_merged.csv
+/tool/source/lectionary/*_merged.json
