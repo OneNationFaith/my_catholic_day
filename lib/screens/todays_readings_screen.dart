@@ -130,7 +130,7 @@ class _TodaysReadingsScreenState
     return Scaffold(
       backgroundColor: _cream,
       appBar: AppBar(
-        title: const Text("Today's Mass Readings"),
+        title: const Text("Mass Readings"),
         actions: <Widget>[
           IconButton(
             tooltip: 'Choose a date',
@@ -179,7 +179,7 @@ class _TodaysReadingsScreenState
                 18,
                 18,
                 18,
-                32,
+                56,
               ),
               children: <Widget>[
                 _DateNavigationCard(
