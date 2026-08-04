@@ -16,7 +16,7 @@ class ScriptureDatabase {
 
   // Increase this number whenever a newly rebuilt WEBC database
   // should replace the database already installed on a device.
-  static const int _assetDatabaseVersion = 3;
+  static const int _assetDatabaseVersion = 4;
 
   sqflite.Database? _database;
 

@@ -450,17 +450,34 @@ String _cleanInlineText(String input) {
     '',
   );
 
-  text = text.replaceAll(RegExp(r'\\\+?[A-Za-z][A-Za-z0-9]*\*?'), '');
+  text = text.replaceAll(
+    RegExp(r'\\\+?[A-Za-z][A-Za-z0-9]*\*?'),
+    '',
+  );
 
   text = text.replaceAll('\u00A0', ' ');
   text = text.replaceAll('\u200B', '');
-
   text = text.replaceAll(RegExp(r'[ \t\n]+'), ' ');
+
   text = text.replaceAllMapped(
-    RegExp(r"([’'])\s+([A-Za-z])"),
-    (Match match) => '${match.group(1)}${match.group(2)}',
+    RegExp(
+      r"\b([A-Za-z]+)([’'])\s+"
+      r"(s|t|d|ll|re|ve|m)\b",
+      caseSensitive: false,
+    ),
+    (Match match) =>
+        '${match.group(1)}${match.group(2)}${match.group(3)}',
   );
-  text = text.replaceAll(RegExp(r'\s+([,.;:!?])'), r'$1');
+
+  text = text.replaceAllMapped(
+    RegExp(r'([“‘])\s+'),
+    (Match match) => match.group(1)!,
+  );
+
+  text = text.replaceAll(
+    RegExp(r'\s+([,.;:!?])'),
+    r'$1',
+  );
 
   return text.trim();
 }
