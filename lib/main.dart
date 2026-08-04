@@ -28,7 +28,7 @@ class MyCatholicDayApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'My Catholic Day',
+      title: 'One Nation Faith',
       theme: AppTheme.lightTheme,
 
       home: const MainShell(),
@@ -67,7 +67,7 @@ PrayScreen(),
   ];
 
   static const List<String> _titles = [
-    'My Catholic Day',
+    'One Nation Faith',
     'Pray',
     'Learn',
     'Live',
