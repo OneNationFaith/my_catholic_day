@@ -575,6 +575,70 @@ class _ReadingCard extends StatelessWidget {
                 ),
               ),
             ],
+            if (reading.kind == ReadingKind.gospel) ...<Widget>[
+              const SizedBox(height: 18),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF8E8),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _gold.withValues(alpha: 0.55),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'The Lord be with you.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(
+                            color: _navy,
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'And with your spirit.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(
+                            color: _burgundy,
+                            fontStyle: FontStyle.italic,
+                          ),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'A reading from the holy Gospel according to '
+                      '${reading.reference.trim().split(RegExp(r'\s+')).first}.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(
+                            color: _navy,
+                            fontWeight: FontWeight.w700,
+                            height: 1.4,
+                          ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      'Glory to you, O Lord.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge
+                          ?.copyWith(
+                            color: _burgundy,
+                            fontStyle: FontStyle.italic,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 18),
             SelectableText(
               reading.text,
@@ -587,6 +651,34 @@ class _ReadingCard extends StatelessWidget {
                     fontSize: 17,
                   ),
             ),
+            if (reading.kind == ReadingKind.gospel) ...<Widget>[
+              const SizedBox(height: 20),
+              Divider(
+                color: _gold.withValues(alpha: 0.65),
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'The Gospel of the Lord.',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(
+                      color: _navy,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                'Praise to you, Lord Jesus Christ.',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge
+                    ?.copyWith(
+                      color: _burgundy,
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+            ],
           ],
         ),
       ),
