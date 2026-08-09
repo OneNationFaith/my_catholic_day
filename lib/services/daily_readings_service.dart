@@ -38,8 +38,8 @@ class DailyReadingsService {
         date: normalizedDate,
         liturgicalDay: 'Readings Coming Soon',
         translationName:
-            'World English Bible, Catholic Edition',
-        translationAbbreviation: 'WEBC',
+            'Douay-Rheims 1899 American Edition',
+        translationAbbreviation: 'DRA',
         translationNotice:
             'The Mass reading references for this date have not '
             'yet been added. Scripture wording may differ from '
@@ -68,7 +68,7 @@ class DailyReadingsService {
         if (passage.isEmpty) {
           throw StateError(
             '${reference.displayReference} could not be loaded '
-            'from the WEBC database.',
+            'from the Douay-Rheims database.',
           );
         }
 
@@ -90,12 +90,12 @@ class DailyReadingsService {
       date: normalizedDate,
       liturgicalDay: references.liturgicalDay,
       translationName:
-          'World English Bible, Catholic Edition',
-      translationAbbreviation: 'WEBC',
+          'Douay-Rheims 1899 American Edition',
+      translationAbbreviation: 'DRA',
       translationNotice:
           'The reading references follow the Catholic Mass '
           'readings for this date. Scripture text is from the '
-          'World English Bible, Catholic Edition. Wording may '
+          'Douay-Rheims 1899 American Edition. Wording may '
           'differ from the official Lectionary used at Mass in '
           'the United States.',
       readings: readings,

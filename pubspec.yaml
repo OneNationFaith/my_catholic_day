@@ -47,4 +47,7 @@ flutter:
 
   assets:
     - assets/databases/webc.db
+    - assets/databases/dra.db
     - assets/data/lectionary/
+    - assets/images/onf_logo.png
+

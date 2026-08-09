@@ -11,12 +11,12 @@ class ScriptureDatabase {
 
   static final ScriptureDatabase instance = ScriptureDatabase._();
 
-  static const String _assetPath = 'assets/databases/webc.db';
-  static const String _databaseFileName = 'webc.db';
+  static const String _assetPath = 'assets/databases/dra.db';
+  static const String _databaseFileName = 'dra.db';
 
-  // Increase this number whenever a newly rebuilt WEBC database
-  // should replace the database already installed on a device.
-  static const int _assetDatabaseVersion = 4;
+// Increase this number whenever a newly rebuilt DRA database
+// should replace the database already installed on a device.
+  static const int _assetDatabaseVersion = 1;
 
   sqflite.Database? _database;
 
