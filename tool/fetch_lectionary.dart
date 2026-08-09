@@ -4,20 +4,15 @@ import 'dart:io';
 
 import 'package:sqlite3/sqlite3.dart';
 
-const String _defaultBaseUrl =
-    'https://cpbjr.github.io/catholic-readings-api';
+const String _defaultBaseUrl = 'https://cpbjr.github.io/catholic-readings-api';
 
-const String _bibleDatabasePath =
-    'assets/databases/webc.db';
+const String _bibleDatabasePath = 'assets/databases/webc.db';
 
-const String _defaultOutputDirectory =
-    'tool/source/lectionary';
+const String _defaultOutputDirectory = 'tool/source/lectionary';
 
-const String _usccbCacheDirectory =
-    'tool/cache/usccb';
+const String _usccbCacheDirectory = 'tool/cache/usccb';
 
-const Duration _usccbMinimumDelay =
-    Duration(seconds: 3);
+const Duration _usccbMinimumDelay = Duration(seconds: 3);
 
 const List<String> _csvHeaders = <String>[
   'date',
@@ -37,98 +32,69 @@ const List<String> _csvHeaders = <String>[
   'displayVerseOffset',
 ];
 
-const List<SourceReadingDefinition>
-    _readingDefinitions =
+const List<SourceReadingDefinition> _readingDefinitions =
     <SourceReadingDefinition>[
-  SourceReadingDefinition(
-    sourceKeys: <String>[
-      'firstReading',
-      'first_reading',
-      'reading1',
-    ],
-    kind: 'firstReading',
-    title: 'First Reading',
-    required: true,
-  ),
-  SourceReadingDefinition(
-    sourceKeys: <String>[
-      'psalm',
-      'responsorialPsalm',
-      'responsorial_psalm',
-    ],
-    kind: 'responsorialPsalm',
-    title: 'Responsorial Psalm',
-    required: true,
-  ),
-  SourceReadingDefinition(
-    sourceKeys: <String>[
-      'secondReading',
-      'second_reading',
-      'reading2',
-    ],
-    kind: 'secondReading',
-    title: 'Second Reading',
-    required: false,
-  ),
-  SourceReadingDefinition(
-    sourceKeys: <String>[
-      'gospelAcclamation',
-      'gospel_acclamation',
-      'acclamation',
-    ],
-    kind: 'gospelAcclamation',
-    title: 'Gospel Acclamation',
-    required: false,
-  ),
-  SourceReadingDefinition(
-    sourceKeys: <String>[
-      'gospel',
-    ],
-    kind: 'gospel',
-    title: 'Gospel',
-    required: true,
-  ),
-];
+      SourceReadingDefinition(
+        sourceKeys: <String>['firstReading', 'first_reading', 'reading1'],
+        kind: 'firstReading',
+        title: 'First Reading',
+        required: true,
+      ),
+      SourceReadingDefinition(
+        sourceKeys: <String>[
+          'psalm',
+          'responsorialPsalm',
+          'responsorial_psalm',
+        ],
+        kind: 'responsorialPsalm',
+        title: 'Responsorial Psalm',
+        required: true,
+      ),
+      SourceReadingDefinition(
+        sourceKeys: <String>['secondReading', 'second_reading', 'reading2'],
+        kind: 'secondReading',
+        title: 'Second Reading',
+        required: false,
+      ),
+      SourceReadingDefinition(
+        sourceKeys: <String>[
+          'gospelAcclamation',
+          'gospel_acclamation',
+          'acclamation',
+        ],
+        kind: 'gospelAcclamation',
+        title: 'Gospel Acclamation',
+        required: false,
+      ),
+      SourceReadingDefinition(
+        sourceKeys: <String>['gospel'],
+        kind: 'gospel',
+        title: 'Gospel',
+        required: true,
+      ),
+    ];
 
 Future<void> main(List<String> arguments) async {
   try {
-    final FetchOptions options = FetchOptions.parse(
-      arguments,
-    );
+    final FetchOptions options = FetchOptions.parse(arguments);
 
     if (options.showHelp) {
       _printUsage();
       return;
     }
 
-    stdout.writeln(
-      'One Nation Faith Lectionary Fetcher',
-    );
-    stdout.writeln(
-      '=================================',
-    );
+    stdout.writeln('One Nation Faith Lectionary Fetcher');
+    stdout.writeln('=================================');
     stdout.writeln();
 
-    stdout.writeln(
-      'Year: ${options.year}',
-    );
-    stdout.writeln(
-      'From: ${_formatDate(options.startDate)}',
-    );
-    stdout.writeln(
-      'To: ${_formatDate(options.endDate)}',
-    );
-    stdout.writeln(
-      'Output: ${options.outputPath}',
-    );
-    stdout.writeln(
-      'Report: ${options.reportPath}',
-    );
+    stdout.writeln('Year: ${options.year}');
+    stdout.writeln('From: ${_formatDate(options.startDate)}');
+    stdout.writeln('To: ${_formatDate(options.endDate)}');
+    stdout.writeln('Output: ${options.outputPath}');
+    stdout.writeln('Report: ${options.reportPath}');
     stdout.writeln();
 
-    final File databaseFile = File(
-      _bibleDatabasePath,
-    );
+    final File databaseFile = File(_bibleDatabasePath);
 
     if (!databaseFile.existsSync()) {
       throw FetchException(
@@ -137,16 +103,11 @@ Future<void> main(List<String> arguments) async {
       );
     }
 
-    final File outputFile = File(
-      options.outputPath,
-    );
+    final File outputFile = File(options.outputPath);
 
-    final File reportFile = File(
-      options.reportPath,
-    );
+    final File reportFile = File(options.reportPath);
 
-    if (outputFile.existsSync() &&
-        !options.force) {
+    if (outputFile.existsSync() && !options.force) {
       throw FetchException(
         'The candidate CSV already exists:\n'
         '${outputFile.path}\n\n'
@@ -154,8 +115,7 @@ Future<void> main(List<String> arguments) async {
       );
     }
 
-    if (reportFile.existsSync() &&
-        !options.force) {
+    if (reportFile.existsSync() && !options.force) {
       throw FetchException(
         'The fetch report already exists:\n'
         '${reportFile.path}\n\n'
@@ -163,12 +123,9 @@ Future<void> main(List<String> arguments) async {
       );
     }
 
-    stdout.writeln(
-      'Loading the WEBC Bible index...',
-    );
+    stdout.writeln('Loading the WEBC Bible index...');
 
-    final BibleCatalog bibleCatalog =
-        BibleCatalog.load(databaseFile);
+    final BibleCatalog bibleCatalog = BibleCatalog.load(databaseFile);
 
     stdout.writeln(
       'Loaded ${bibleCatalog.bookCount} '
@@ -176,21 +133,15 @@ Future<void> main(List<String> arguments) async {
     );
     stdout.writeln();
 
-    final List<DateTime> dates =
-        _datesBetween(
+    final List<DateTime> dates = _datesBetween(
       options.startDate,
       options.endDate,
     );
 
-    stdout.writeln(
-      'Fetching ${dates.length} date(s)...',
-    );
+    stdout.writeln('Fetching ${dates.length} date(s)...');
     stdout.writeln();
 
-    final HttpJsonClient httpClient =
-        HttpJsonClient(
-      baseUrl: options.baseUrl,
-    );
+    final HttpJsonClient httpClient = HttpJsonClient(baseUrl: options.baseUrl);
 
     late final List<DayFetchResult> results;
 
@@ -206,57 +157,39 @@ Future<void> main(List<String> arguments) async {
     }
 
     results.sort(
-      (
-        DayFetchResult first,
-        DayFetchResult second,
-      ) =>
+      (DayFetchResult first, DayFetchResult second) =>
           first.date.compareTo(second.date),
     );
 
-    final List<CsvReadingRow> outputRows =
-        <CsvReadingRow>[];
+    final List<CsvReadingRow> outputRows = <CsvReadingRow>[];
 
-    for (final DayFetchResult result
-        in results) {
+    for (final DayFetchResult result in results) {
       if (result.isIncluded) {
         outputRows.addAll(result.rows);
       }
     }
 
-    outputRows.sort(
-      (
-        CsvReadingRow first,
-        CsvReadingRow second,
-      ) {
-        final int dateComparison =
-            first.date.compareTo(second.date);
+    outputRows.sort((CsvReadingRow first, CsvReadingRow second) {
+      final int dateComparison = first.date.compareTo(second.date);
 
-        if (dateComparison != 0) {
-          return dateComparison;
-        }
+      if (dateComparison != 0) {
+        return dateComparison;
+      }
 
-        final int readingComparison =
-            first.readingOrder.compareTo(
-          second.readingOrder,
-        );
+      final int readingComparison = first.readingOrder.compareTo(
+        second.readingOrder,
+      );
 
-        if (readingComparison != 0) {
-          return readingComparison;
-        }
+      if (readingComparison != 0) {
+        return readingComparison;
+      }
 
-        return first.rangeOrder.compareTo(
-          second.rangeOrder,
-        );
-      },
-    );
+      return first.rangeOrder.compareTo(second.rangeOrder);
+    });
 
-    await outputFile.parent.create(
-      recursive: true,
-    );
+    await outputFile.parent.create(recursive: true);
 
-    await reportFile.parent.create(
-      recursive: true,
-    );
+    await reportFile.parent.create(recursive: true);
 
     outputFile.writeAsStringSync(
       _buildCsv(outputRows),
@@ -264,30 +197,21 @@ Future<void> main(List<String> arguments) async {
       flush: true,
     );
 
-    final FetchSummary summary =
-        FetchSummary.fromResults(
+    final FetchSummary summary = FetchSummary.fromResults(
       requestedDateCount: dates.length,
       results: results,
       outputRowCount: outputRows.length,
     );
 
     reportFile.writeAsStringSync(
-      _buildReport(
-        options: options,
-        results: results,
-        summary: summary,
-      ),
+      _buildReport(options: options, results: results, summary: summary),
       encoding: utf8,
       flush: true,
     );
 
     stdout.writeln();
-    stdout.writeln(
-      'Fetch Summary',
-    );
-    stdout.writeln(
-      '=============',
-    );
+    stdout.writeln('Fetch Summary');
+    stdout.writeln('=============');
     stdout.writeln(
       'Dates requested: '
       '${summary.requestedDateCount}',
@@ -308,44 +232,26 @@ Future<void> main(List<String> arguments) async {
       'CSV rows written: '
       '${summary.outputRowCount}',
     );
-    stdout.writeln(
-      'Warnings: ${summary.warningCount}',
-    );
-    stdout.writeln(
-      'Errors: ${summary.errorCount}',
-    );
+    stdout.writeln('Warnings: ${summary.warningCount}');
+    stdout.writeln('Errors: ${summary.errorCount}');
     stdout.writeln();
 
-    stdout.writeln(
-      'Candidate CSV created:',
-    );
-    stdout.writeln(
-      outputFile.path,
-    );
+    stdout.writeln('Candidate CSV created:');
+    stdout.writeln(outputFile.path);
     stdout.writeln();
 
-    stdout.writeln(
-      'Review report created:',
-    );
-    stdout.writeln(
-      reportFile.path,
-    );
+    stdout.writeln('Review report created:');
+    stdout.writeln(reportFile.path);
     stdout.writeln();
 
     if (summary.errorCount > 0) {
-      stdout.writeln(
-        'FETCH COMPLETED WITH ERRORS',
-      );
-      stdout.writeln(
-        'Review the report before using the CSV.',
-      );
+      stdout.writeln('FETCH COMPLETED WITH ERRORS');
+      stdout.writeln('Review the report before using the CSV.');
       exitCode = 2;
       return;
     }
 
-    stdout.writeln(
-      'FETCH COMPLETED SUCCESSFULLY',
-    );
+    stdout.writeln('FETCH COMPLETED SUCCESSFULLY');
     stdout.writeln(
       'The candidate CSV still requires '
       'liturgical review before it replaces '
@@ -353,43 +259,25 @@ Future<void> main(List<String> arguments) async {
     );
   } on FetchException catch (error) {
     stderr.writeln();
-    stderr.writeln(
-      'FETCH FAILED',
-    );
-    stderr.writeln(
-      error.message,
-    );
+    stderr.writeln('FETCH FAILED');
+    stderr.writeln(error.message);
     exitCode = 1;
   } on FileSystemException catch (error) {
     stderr.writeln();
-    stderr.writeln(
-      'FETCH FAILED',
-    );
-    stderr.writeln(
-      error.message,
-    );
+    stderr.writeln('FETCH FAILED');
+    stderr.writeln(error.message);
     exitCode = 1;
   } on FormatException catch (error) {
     stderr.writeln();
-    stderr.writeln(
-      'FETCH FAILED',
-    );
-    stderr.writeln(
-      error.message,
-    );
+    stderr.writeln('FETCH FAILED');
+    stderr.writeln(error.message);
     exitCode = 1;
   } catch (error, stackTrace) {
     stderr.writeln();
-    stderr.writeln(
-      'FETCH FAILED',
-    );
-    stderr.writeln(
-      error,
-    );
+    stderr.writeln('FETCH FAILED');
+    stderr.writeln(error);
     stderr.writeln();
-    stderr.writeln(
-      stackTrace,
-    );
+    stderr.writeln(stackTrace);
     exitCode = 1;
   }
 }
@@ -400,8 +288,7 @@ Future<List<DayFetchResult>> _fetchAllDates({
   required BibleCatalog bibleCatalog,
   required HttpJsonClient httpClient,
 }) async {
-  final List<DayFetchResult?> results =
-      List<DayFetchResult?>.filled(
+  final List<DayFetchResult?> results = List<DayFetchResult?>.filled(
     dates.length,
     null,
   );
@@ -420,8 +307,7 @@ Future<List<DayFetchResult>> _fetchAllDates({
 
       final DateTime date = dates[index];
 
-      final DayFetchResult result =
-          await _fetchDate(
+      final DayFetchResult result = await _fetchDate(
         date: date,
         options: options,
         bibleCatalog: bibleCatalog,
@@ -431,8 +317,7 @@ Future<List<DayFetchResult>> _fetchAllDates({
       results[index] = result;
       completedCount++;
 
-      if (completedCount == dates.length ||
-          completedCount % 10 == 0) {
+      if (completedCount == dates.length || completedCount % 10 == 0) {
         stdout.writeln(
           'Fetched $completedCount of '
           '${dates.length} date(s)...',
@@ -441,21 +326,13 @@ Future<List<DayFetchResult>> _fetchAllDates({
     }
   }
 
-  final int workerCount =
-      options.concurrency > dates.length
-          ? dates.length
-          : options.concurrency;
+  final int workerCount = options.concurrency > dates.length
+      ? dates.length
+      : options.concurrency;
 
-  await Future.wait(
-    List<Future<void>>.generate(
-      workerCount,
-      (_) => worker(),
-    ),
-  );
+  await Future.wait(List<Future<void>>.generate(workerCount, (_) => worker()));
 
-  return results
-      .whereType<DayFetchResult>()
-      .toList();
+  return results.whereType<DayFetchResult>().toList();
 }
 
 Future<DayFetchResult> _fetchDate({
@@ -498,9 +375,7 @@ Future<DayFetchResult> _fetchDate({
   }
 
   if (readingsJson == null) {
-    errors.add(
-      'The readings endpoint returned no data.',
-    );
+    errors.add('The readings endpoint returned no data.');
 
     return DayFetchResult(
       date: dateText,
@@ -512,23 +387,16 @@ Future<DayFetchResult> _fetchDate({
     );
   }
 
-  final String? sourceDate =
-      _optionalString(
-    readingsJson['date'],
-  );
+  final String? sourceDate = _optionalString(readingsJson['date']);
 
-  if (sourceDate != null &&
-      sourceDate != dateText) {
+  if (sourceDate != null && sourceDate != dateText) {
     errors.add(
       'The readings endpoint returned '
       '$sourceDate instead of $dateText.',
     );
   }
 
-  final Map<String, dynamic>? readings =
-      _asStringMap(
-    readingsJson['readings'],
-  );
+  final Map<String, dynamic>? readings = _asStringMap(readingsJson['readings']);
 
   if (readings == null) {
     errors.add(
@@ -546,68 +414,58 @@ Future<DayFetchResult> _fetchDate({
     );
   }
 
-  if (!_containsGospelAcclamation(readings)) {
-    final String usccbPageUrl = _optionalString(
-          readingsJson['usccbLink'],
-        ) ??
-        _buildUsccbDailyReadingsUrl(date);
+  final String usccbPageUrl =
+      _optionalString(readingsJson['usccbLink']) ??
+      _buildUsccbDailyReadingsUrl(date);
 
-    try {
-      final File usccbCacheFile = File(
-        '$_usccbCacheDirectory/$dateText.html',
+  String? usccbHtml;
+
+  try {
+    final File usccbCacheFile = File('$_usccbCacheDirectory/$dateText.html');
+
+    usccbHtml = await httpClient.getTextUrl(
+      usccbPageUrl,
+      cacheFile: usccbCacheFile,
+    );
+
+    if (usccbHtml == null) {
+      warnings.add(
+        'The USCCB page was not found: '
+        '$usccbPageUrl',
+      );
+    } else if (!_containsGospelAcclamation(readings)) {
+      final String? reference = _extractUsccbGospelAcclamationReference(
+        usccbHtml,
       );
 
-      final String? usccbHtml =
-          await httpClient.getTextUrl(
-        usccbPageUrl,
-        cacheFile: usccbCacheFile,
-      );
-
-      if (usccbHtml == null) {
+      if (reference == null) {
         warnings.add(
-          'The USCCB page was not found: '
-          '$usccbPageUrl',
+          'The USCCB page supplied no '
+          'Scripture reference for the Gospel '
+          'Acclamation. The acclamation may be '
+          'text-only and requires review.',
         );
       } else {
-        final String? reference =
-            _extractUsccbGospelAcclamationReference(
-          usccbHtml,
-        );
-
-        if (reference == null) {
-          warnings.add(
-            'The USCCB page supplied no '
-            'Scripture reference for the Gospel '
-            'Acclamation. The acclamation may be '
-            'text-only and requires review.',
-          );
-        } else {
-          readings['gospelAcclamation'] =
-              reference;
-        }
+        readings['gospelAcclamation'] = reference;
       }
-    } on FetchException catch (error) {
-      warnings.add(
-        'Could not fetch the Gospel Acclamation '
-        'from USCCB: ${error.message}',
-      );
     }
+  } on FetchException catch (error) {
+    warnings.add(
+      'Could not fetch the USCCB page: '
+      '${error.message}',
+    );
   }
 
-  final String? season = _optionalString(
-    readingsJson['season'],
-  );
+  final String? season = _optionalString(readingsJson['season']);
 
-  String? liturgicalDay =
-      _extractLiturgicalDay(
-    calendarJson,
-  );
+  String? liturgicalDay = usccbHtml == null
+      ? null
+      : _extractUsccbLiturgicalDayTitle(usccbHtml);
+
+  liturgicalDay ??= _extractLiturgicalDay(calendarJson);
 
   if (liturgicalDay == null) {
-    liturgicalDay = _fallbackLiturgicalDay(
-      date,
-      season,
-    );
+    liturgicalDay = _fallbackLiturgicalDay(date, season);
 
     warnings.add(
       'A precise liturgical-day title was not '
@@ -615,23 +473,14 @@ Future<DayFetchResult> _fetchDate({
     );
   }
 
-  final List<CsvReadingRow> rows =
-      <CsvReadingRow>[];
+  final List<CsvReadingRow> rows = <CsvReadingRow>[];
 
   int readingOrder = 1;
 
-  for (final SourceReadingDefinition definition
-      in _readingDefinitions) {
-    final Object? sourceValue =
-        _firstMapValue(
-      readings,
-      definition.sourceKeys,
-    );
+  for (final SourceReadingDefinition definition in _readingDefinitions) {
+    final Object? sourceValue = _firstMapValue(readings, definition.sourceKeys);
 
-    final List<String> choices =
-        _extractReferenceChoices(
-      sourceValue,
-    );
+    final List<String> choices = _extractReferenceChoices(sourceValue);
 
     if (choices.isEmpty) {
       if (definition.required) {
@@ -644,58 +493,40 @@ Future<DayFetchResult> _fetchDate({
       continue;
     }
 
-    final String? response =
-        definition.kind ==
-                'responsorialPsalm'
-            ? _firstOptionalString(
-                readings,
-                const <String>[
-                  'psalmResponse',
-                  'psalm_response',
-                  'response',
-                ],
-              )
-            : null;
+    final String? response = definition.kind == 'responsorialPsalm'
+        ? _firstOptionalString(readings, const <String>[
+            'psalmResponse',
+            'psalm_response',
+            'response',
+          ])
+        : null;
 
-    for (int choiceIndex = 0;
-        choiceIndex < choices.length;
-        choiceIndex++) {
-      final String reference =
-          choices[choiceIndex];
+    for (int choiceIndex = 0; choiceIndex < choices.length; choiceIndex++) {
+      final String reference = choices[choiceIndex];
 
-      final String? choiceGroup =
-          choices.length > 1
-              ? definition.kind
-              : null;
+      final String? choiceGroup = choices.length > 1 ? definition.kind : null;
 
-      final String? choiceLabel =
-          choices.length > 1
-              ? _choiceLabel(choiceIndex)
-              : null;
+      final String? choiceLabel = choices.length > 1
+          ? _choiceLabel(choiceIndex)
+          : null;
 
-      final String title =
-          choiceLabel == null
-              ? definition.title
-              : '${definition.title} — '
-                  '$choiceLabel';
+      final String title = choiceLabel == null
+          ? definition.title
+          : '${definition.title} — '
+                '$choiceLabel';
 
-      final ReferenceParseResult parsed =
-          ReferenceParser(
+      final ReferenceParseResult parsed = ReferenceParser(
         bibleCatalog,
-      ).parse(
-        _referenceForParsing(reference),
-      );
+      ).parse(_referenceForParsing(reference));
 
-      for (final String warning
-          in parsed.warnings) {
+      for (final String warning in parsed.warnings) {
         warnings.add(
           '${definition.title} '
           '"$reference": $warning',
         );
       }
 
-      for (final String error
-          in parsed.errors) {
+      for (final String error in parsed.errors) {
         errors.add(
           '${definition.title} '
           '"$reference": $error',
@@ -706,11 +537,12 @@ Future<DayFetchResult> _fetchDate({
         continue;
       }
 
-      for (int rangeIndex = 0;
-          rangeIndex < parsed.ranges.length;
-          rangeIndex++) {
-        final ScriptureRange range =
-            parsed.ranges[rangeIndex];
+      for (
+        int rangeIndex = 0;
+        rangeIndex < parsed.ranges.length;
+        rangeIndex++
+      ) {
+        final ScriptureRange range = parsed.ranges[rangeIndex];
 
         rows.add(
           CsvReadingRow(
@@ -719,10 +551,7 @@ Future<DayFetchResult> _fetchDate({
             readingOrder: readingOrder,
             kind: definition.kind,
             title: title,
-            displayReference:
-                _normalizeDisplayReference(
-              reference,
-            ),
+            displayReference: _normalizeDisplayReference(reference),
             response: response,
             choiceGroup: choiceGroup,
             choiceLabel: choiceLabel,
@@ -731,8 +560,7 @@ Future<DayFetchResult> _fetchDate({
             chapter: range.chapter,
             startVerse: range.startVerse,
             endVerse: range.endVerse,
-            displayVerseOffset:
-                range.displayVerseOffset,
+            displayVerseOffset: range.displayVerseOffset,
           ),
         );
       }
@@ -748,14 +576,11 @@ Future<DayFetchResult> _fetchDate({
     );
   }
 
-  if (_firstOptionalString(
-        readings,
-        const <String>[
-          'psalmResponse',
-          'psalm_response',
-          'response',
-        ],
-      ) ==
+  if (_firstOptionalString(readings, const <String>[
+        'psalmResponse',
+        'psalm_response',
+        'response',
+      ]) ==
       null) {
     warnings.add(
       'The source supplied no Responsorial '
@@ -766,14 +591,11 @@ Future<DayFetchResult> _fetchDate({
   final bool hasErrors = errors.isNotEmpty;
 
   final bool includeDay =
-      rows.isNotEmpty &&
-      (!hasErrors || options.includePartial);
+      rows.isNotEmpty && (!hasErrors || options.includePartial);
 
   return DayFetchResult(
     date: dateText,
-    rows: includeDay
-        ? rows
-        : const <CsvReadingRow>[],
+    rows: includeDay ? rows : const <CsvReadingRow>[],
     warnings: warnings,
     errors: errors,
     readingsFetched: true,
@@ -781,15 +603,12 @@ Future<DayFetchResult> _fetchDate({
   );
 }
 
-String? _extractLiturgicalDay(
-  Map<String, dynamic>? calendarJson,
-) {
+String? _extractLiturgicalDay(Map<String, dynamic>? calendarJson) {
   if (calendarJson == null) {
     return null;
   }
 
-  final List<Object?> directValues =
-      <Object?>[
+  final List<Object?> directValues = <Object?>[
     calendarJson['liturgicalDay'],
     calendarJson['liturgical_day'],
     calendarJson['title'],
@@ -804,69 +623,88 @@ String? _extractLiturgicalDay(
     }
   }
 
-  final Map<String, dynamic>? celebration =
-      _asStringMap(
+  final Map<String, dynamic>? celebration = _asStringMap(
     calendarJson['celebration'],
   );
 
   if (celebration != null) {
-    final String? name = _firstOptionalString(
+    final String? celebrationType = _firstOptionalString(
       celebration,
-      const <String>[
-        'name',
-        'title',
-        'celebration',
-      ],
+      const <String>['type', 'rank'],
     );
+
+    if (celebrationType?.toUpperCase() == 'OPT_MEMORIAL') {
+      final String? dateText = _optionalString(calendarJson['date']);
+
+      final DateTime? date = dateText == null
+          ? null
+          : DateTime.tryParse(dateText);
+
+      final String? subSeason = _firstOptionalString(
+        calendarJson,
+        const <String>['subSeason', 'sub_season'],
+      );
+
+      if (date != null && subSeason != null) {
+        final String weekday = const <String>[
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday',
+        ][date.weekday - 1];
+
+        if (subSeason.toLowerCase() == 'time after epiphany') {
+          return '$weekday after Epiphany';
+        }
+      }
+
+      return null;
+    }
+
+    final String? name = _firstOptionalString(celebration, const <String>[
+      'name',
+      'title',
+      'celebration',
+    ]);
 
     if (name != null) {
       return name;
     }
   }
 
-  final Map<String, dynamic>? day =
-      _asStringMap(
-    calendarJson['day'],
-  );
+  final Map<String, dynamic>? day = _asStringMap(calendarJson['day']);
 
   if (day != null) {
-    final String? name = _firstOptionalString(
-      day,
-      const <String>[
-        'name',
-        'title',
-        'celebration',
-        'liturgicalDay',
-      ],
-    );
+    final String? name = _firstOptionalString(day, const <String>[
+      'name',
+      'title',
+      'celebration',
+      'liturgicalDay',
+    ]);
 
     if (name != null) {
       return name;
     }
 
-    final Map<String, dynamic>? nestedCelebration =
-        _asStringMap(
+    final Map<String, dynamic>? nestedCelebration = _asStringMap(
       day['celebration'],
     );
 
     if (nestedCelebration != null) {
-      return _firstOptionalString(
-        nestedCelebration,
-        const <String>[
-          'name',
-          'title',
-        ],
-      );
+      return _firstOptionalString(nestedCelebration, const <String>[
+        'name',
+        'title',
+      ]);
     }
   }
 
   return null;
 }
 
-String _fallbackLiturgicalDay(
-  DateTime date,
-  String? season,
-) {
+String _fallbackLiturgicalDay(DateTime date, String? season) {
   final String weekday = const <String>[
     'Monday',
     'Tuesday',
@@ -885,9 +723,7 @@ String _fallbackLiturgicalDay(
   return '$weekday — $season';
 }
 
-List<String> _extractReferenceChoices(
-  Object? value,
-) {
+List<String> _extractReferenceChoices(Object? value) {
   if (value == null) {
     return const <String>[];
   }
@@ -899,8 +735,7 @@ List<String> _extractReferenceChoices(
       return const <String>[];
     }
 
-    final List<String> splitChoices =
-        trimmed.split(
+    final List<String> splitChoices = trimmed.split(
       RegExp(
         r'\s+(?:or|OR)\s+'
         r'(?=(?:[1-3]\s+)?[A-Za-z])',
@@ -917,16 +752,13 @@ List<String> _extractReferenceChoices(
     final List<String> choices = <String>[];
 
     for (final Object? item in value) {
-      choices.addAll(
-        _extractReferenceChoices(item),
-      );
+      choices.addAll(_extractReferenceChoices(item));
     }
 
     return choices;
   }
 
-  final Map<String, dynamic>? map =
-      _asStringMap(value);
+  final Map<String, dynamic>? map = _asStringMap(value);
 
   if (map != null) {
     for (final String key in const <String>[
@@ -936,10 +768,7 @@ List<String> _extractReferenceChoices(
       'value',
     ]) {
       if (map.containsKey(key)) {
-        final List<String> choices =
-            _extractReferenceChoices(
-          map[key],
-        );
+        final List<String> choices = _extractReferenceChoices(map[key]);
 
         if (choices.isNotEmpty) {
           return choices;
@@ -948,9 +777,7 @@ List<String> _extractReferenceChoices(
     }
 
     if (map.containsKey('choices')) {
-      return _extractReferenceChoices(
-        map['choices'],
-      );
+      return _extractReferenceChoices(map['choices']);
     }
   }
 
@@ -965,53 +792,58 @@ bool _looksLikeReference(String value) {
   return RegExp(r'\d').hasMatch(value);
 }
 
-bool _containsGospelAcclamation(
-  Map<String, dynamic> readings,
-) {
-  return readings.containsKey(
-        'gospelAcclamation',
-      ) ||
-      readings.containsKey(
-        'gospel_acclamation',
-      ) ||
-      readings.containsKey(
-        'acclamation',
-      );
+bool _containsGospelAcclamation(Map<String, dynamic> readings) {
+  return readings.containsKey('gospelAcclamation') ||
+      readings.containsKey('gospel_acclamation') ||
+      readings.containsKey('acclamation');
 }
 
-String _buildUsccbDailyReadingsUrl(
-  DateTime date,
-) {
-  final String month =
-      date.month.toString().padLeft(2, '0');
+String _buildUsccbDailyReadingsUrl(DateTime date) {
+  final String month = date.month.toString().padLeft(2, '0');
 
-  final String day =
-      date.day.toString().padLeft(2, '0');
+  final String day = date.day.toString().padLeft(2, '0');
 
-  final String year =
-      (date.year % 100).toString().padLeft(2, '0');
+  final String year = (date.year % 100).toString().padLeft(2, '0');
 
   return 'https://bible.usccb.org/bible/readings/'
       '$month$day$year.cfm';
 }
 
-String? _extractUsccbGospelAcclamationReference(
-  String html,
-) {
+String? _extractUsccbLiturgicalDayTitle(String html) {
+  final RegExp titlePattern = RegExp(
+    r'<title\b[^>]*>(.*?)</title>',
+    caseSensitive: false,
+    dotAll: true,
+  );
+
+  final RegExpMatch? match = titlePattern.firstMatch(html);
+
+  if (match == null) {
+    return null;
+  }
+
+  final String title = _htmlToPlainText(match.group(1) ?? '');
+
+  final String cleaned = title
+      .replaceFirst(RegExp(r'\s*\|\s*USCCB\s*$', caseSensitive: false), '')
+      .trim();
+
+  return cleaned.isEmpty ? null : cleaned;
+}
+
+String? _extractUsccbGospelAcclamationReference(String html) {
   final RegExp headingPattern = RegExp(
     r'<h[1-6]\b[^>]*>(.*?)</h[1-6]>',
     caseSensitive: false,
     dotAll: true,
   );
 
-  for (final RegExpMatch headingMatch
-      in headingPattern.allMatches(html)) {
+  for (final RegExpMatch headingMatch in headingPattern.allMatches(html)) {
     final String heading = _htmlToPlainText(
       headingMatch.group(1) ?? '',
     ).toLowerCase();
 
-    if (heading != 'alleluia' &&
-        heading != 'verse before the gospel') {
+    if (heading != 'alleluia' && heading != 'verse before the gospel') {
       continue;
     }
 
@@ -1020,18 +852,13 @@ String? _extractUsccbGospelAcclamationReference(
     final RegExpMatch? nextHeading = RegExp(
       r'<h[1-6]\b',
       caseSensitive: false,
-    ).firstMatch(
-      html.substring(sectionStart),
-    );
+    ).firstMatch(html.substring(sectionStart));
 
     final int sectionEnd = nextHeading == null
         ? html.length
         : sectionStart + nextHeading.start;
 
-    final String section = html.substring(
-      sectionStart,
-      sectionEnd,
-    );
+    final String section = html.substring(sectionStart, sectionEnd);
 
     final RegExp anchorPattern = RegExp(
       r'<a\b[^>]*>(.*?)</a>',
@@ -1039,11 +866,8 @@ String? _extractUsccbGospelAcclamationReference(
       dotAll: true,
     );
 
-    for (final RegExpMatch anchorMatch
-        in anchorPattern.allMatches(section)) {
-      final String candidate = _htmlToPlainText(
-        anchorMatch.group(1) ?? '',
-      );
+    for (final RegExpMatch anchorMatch in anchorPattern.allMatches(section)) {
+      final String candidate = _htmlToPlainText(anchorMatch.group(1) ?? '');
 
       if (_looksLikeScriptureReference(candidate)) {
         return candidate;
@@ -1055,8 +879,7 @@ String? _extractUsccbGospelAcclamationReference(
       preserveLineBreaks: true,
     );
 
-    for (final String line
-        in sectionText.split('\n')) {
+    for (final String line in sectionText.split('\n')) {
       final String candidate = line.trim();
 
       if (_looksLikeScriptureReference(candidate)) {
@@ -1086,55 +909,34 @@ bool _looksLikeScriptureReference(String value) {
 }
 
 String _referenceForParsing(String reference) {
-  return reference.replaceFirst(
-    RegExp(
-      r'^(?:cf\.?|see)\s+',
-      caseSensitive: false,
-    ),
-    '',
-  ).trim();
+  return reference
+      .replaceFirst(RegExp(r'^(?:cf\.?|see)\s+', caseSensitive: false), '')
+      .trim();
 }
 
-String _htmlToPlainText(
-  String html, {
-  bool preserveLineBreaks = false,
-}) {
+String _htmlToPlainText(String html, {bool preserveLineBreaks = false}) {
   String value = html;
 
   if (preserveLineBreaks) {
     value = value.replaceAll(
-      RegExp(
-        r'<(?:br\s*/?|/p|/div|/li)>',
-        caseSensitive: false,
-      ),
+      RegExp(r'<(?:br\s*/?|/p|/div|/li)>', caseSensitive: false),
       '\n',
     );
   }
 
-  value = value.replaceAll(
-    RegExp(r'<[^>]+>', dotAll: true),
-    ' ',
-  );
+  value = value.replaceAll(RegExp(r'<[^>]+>', dotAll: true), ' ');
 
   value = _decodeBasicHtmlEntities(value);
 
   if (preserveLineBreaks) {
     return value
         .split('\n')
-        .map(
-          (String line) => line.replaceAll(
-            RegExp(r'\s+'),
-            ' ',
-          ).trim(),
-        )
+        .map((String line) => line.replaceAll(RegExp(r'\s+'), ' ').trim())
         .where((String line) => line.isNotEmpty)
         .join('\n');
   }
 
-  return value.replaceAll(
-    RegExp(r'\s+'),
-    ' ',
-  ).trim();
+  return value.replaceAll(RegExp(r'\s+'), ' ').trim();
 }
 
 String _decodeBasicHtmlEntities(String value) {
@@ -1148,40 +950,28 @@ String _decodeBasicHtmlEntities(String value) {
       .replaceAll('&ndash;', '–')
       .replaceAll('&mdash;', '—');
 
-  decoded = decoded.replaceAllMapped(
-    RegExp(r'&#(\d+);'),
-    (Match match) {
-      final int? codePoint = int.tryParse(
-        match.group(1) ?? '',
-      );
+  decoded = decoded.replaceAllMapped(RegExp(r'&#(\d+);'), (Match match) {
+    final int? codePoint = int.tryParse(match.group(1) ?? '');
 
-      return codePoint == null
-          ? match.group(0) ?? ''
-          : String.fromCharCode(codePoint);
-    },
-  );
+    return codePoint == null
+        ? match.group(0) ?? ''
+        : String.fromCharCode(codePoint);
+  });
 
-  decoded = decoded.replaceAllMapped(
-    RegExp(r'&#x([0-9a-fA-F]+);'),
-    (Match match) {
-      final int? codePoint = int.tryParse(
-        match.group(1) ?? '',
-        radix: 16,
-      );
+  decoded = decoded.replaceAllMapped(RegExp(r'&#x([0-9a-fA-F]+);'), (
+    Match match,
+  ) {
+    final int? codePoint = int.tryParse(match.group(1) ?? '', radix: 16);
 
-      return codePoint == null
-          ? match.group(0) ?? ''
-          : String.fromCharCode(codePoint);
-    },
-  );
+    return codePoint == null
+        ? match.group(0) ?? ''
+        : String.fromCharCode(codePoint);
+  });
 
   return decoded;
 }
 
-Object? _firstMapValue(
-  Map<String, dynamic> map,
-  List<String> keys,
-) {
+Object? _firstMapValue(Map<String, dynamic> map, List<String> keys) {
   for (final String key in keys) {
     if (map.containsKey(key)) {
       return map[key];
@@ -1191,14 +981,9 @@ Object? _firstMapValue(
   return null;
 }
 
-String? _firstOptionalString(
-  Map<String, dynamic> map,
-  List<String> keys,
-) {
+String? _firstOptionalString(Map<String, dynamic> map, List<String> keys) {
   for (final String key in keys) {
-    final String? value = _optionalString(
-      map[key],
-    );
+    final String? value = _optionalString(map[key]);
 
     if (value != null) {
       return value;
@@ -1218,23 +1003,15 @@ String? _optionalString(Object? value) {
   return trimmed.isEmpty ? null : trimmed;
 }
 
-Map<String, dynamic>? _asStringMap(
-  Object? value,
-) {
+Map<String, dynamic>? _asStringMap(Object? value) {
   if (value is Map<String, dynamic>) {
     return value;
   }
 
   if (value is Map<dynamic, dynamic>) {
     return value.map(
-      (
-        dynamic key,
-        dynamic item,
-      ) =>
-          MapEntry<String, dynamic>(
-        key.toString(),
-        item,
-      ),
+      (dynamic key, dynamic item) =>
+          MapEntry<String, dynamic>(key.toString(), item),
     );
   }
 
@@ -1264,37 +1041,23 @@ String _choiceLabel(int zeroBasedIndex) {
   return 'Choice ${zeroBasedIndex + 1}';
 }
 
-String _normalizeDisplayReference(
-  String reference,
-) {
+String _normalizeDisplayReference(String reference) {
   return reference
       .trim()
       .replaceAll('—', '–')
       .replaceAllMapped(
         RegExp(r'(\d)-(\d)'),
-        (Match match) =>
-            '${match.group(1)}–${match.group(2)}',
+        (Match match) => '${match.group(1)}–${match.group(2)}',
       );
 }
 
-String _buildCsv(
-  List<CsvReadingRow> rows,
-) {
+String _buildCsv(List<CsvReadingRow> rows) {
   final StringBuffer output = StringBuffer();
 
-  output.writeln(
-    _csvHeaders
-        .map(_escapeCsvField)
-        .join(','),
-  );
+  output.writeln(_csvHeaders.map(_escapeCsvField).join(','));
 
   for (final CsvReadingRow row in rows) {
-    output.writeln(
-      row
-          .toValues()
-          .map(_escapeCsvField)
-          .join(','),
-    );
+    output.writeln(row.toValues().map(_escapeCsvField).join(','));
   }
 
   return output.toString();
@@ -1307,29 +1070,17 @@ String _buildReport({
 }) {
   final StringBuffer report = StringBuffer();
 
-  report.writeln(
-    'One Nation Faith Lectionary Fetch Report',
-  );
-  report.writeln(
-    '======================================',
-  );
+  report.writeln('One Nation Faith Lectionary Fetch Report');
+  report.writeln('======================================');
   report.writeln();
   report.writeln(
     'Generated: '
     '${DateTime.now().toUtc().toIso8601String()}',
   );
-  report.writeln(
-    'Source: ${options.baseUrl}',
-  );
-  report.writeln(
-    'Year: ${options.year}',
-  );
-  report.writeln(
-    'From: ${_formatDate(options.startDate)}',
-  );
-  report.writeln(
-    'To: ${_formatDate(options.endDate)}',
-  );
+  report.writeln('Source: ${options.baseUrl}');
+  report.writeln('Year: ${options.year}');
+  report.writeln('From: ${_formatDate(options.startDate)}');
+  report.writeln('To: ${_formatDate(options.endDate)}');
   report.writeln();
   report.writeln(
     'Dates requested: '
@@ -1351,20 +1102,12 @@ String _buildReport({
     'CSV rows written: '
     '${summary.outputRowCount}',
   );
-  report.writeln(
-    'Warnings: ${summary.warningCount}',
-  );
-  report.writeln(
-    'Errors: ${summary.errorCount}',
-  );
+  report.writeln('Warnings: ${summary.warningCount}');
+  report.writeln('Errors: ${summary.errorCount}');
   report.writeln();
 
-  report.writeln(
-    'IMPORTANT REVIEW NOTES',
-  );
-  report.writeln(
-    '----------------------',
-  );
+  report.writeln('IMPORTANT REVIEW NOTES');
+  report.writeln('----------------------');
   report.writeln(
     '1. This is candidate data and must not '
     'automatically replace the verified CSV.',
@@ -1394,38 +1137,24 @@ String _buildReport({
   );
   report.writeln();
 
-  for (final DayFetchResult result
-      in results) {
-    if (result.warnings.isEmpty &&
-        result.errors.isEmpty) {
+  for (final DayFetchResult result in results) {
+    if (result.warnings.isEmpty && result.errors.isEmpty) {
       continue;
     }
 
-    report.writeln(
-      result.date,
-    );
-    report.writeln(
-      '-' * result.date.length,
-    );
+    report.writeln(result.date);
+    report.writeln('-' * result.date.length);
 
-    for (final String warning
-        in result.warnings) {
-      report.writeln(
-        'WARNING: $warning',
-      );
+    for (final String warning in result.warnings) {
+      report.writeln('WARNING: $warning');
     }
 
-    for (final String error
-        in result.errors) {
-      report.writeln(
-        'ERROR: $error',
-      );
+    for (final String error in result.errors) {
+      report.writeln('ERROR: $error');
     }
 
     if (!result.isIncluded) {
-      report.writeln(
-        'RESULT: Date omitted from candidate CSV.',
-      );
+      report.writeln('RESULT: Date omitted from candidate CSV.');
     }
 
     report.writeln();
@@ -1448,30 +1177,17 @@ String _escapeCsvField(String value) {
   return '"${value.replaceAll('"', '""')}"';
 }
 
-List<DateTime> _datesBetween(
-  DateTime start,
-  DateTime end,
-) {
+List<DateTime> _datesBetween(DateTime start, DateTime end) {
   final List<DateTime> dates = <DateTime>[];
 
-  DateTime current = DateTime.utc(
-    start.year,
-    start.month,
-    start.day,
-  );
+  DateTime current = DateTime.utc(start.year, start.month, start.day);
 
-  final DateTime finalDate = DateTime.utc(
-    end.year,
-    end.month,
-    end.day,
-  );
+  final DateTime finalDate = DateTime.utc(end.year, end.month, end.day);
 
   while (!current.isAfter(finalDate)) {
     dates.add(current);
 
-    current = current.add(
-      const Duration(days: 1),
-    );
+    current = current.add(const Duration(days: 1));
   }
 
   return dates;
@@ -1489,41 +1205,25 @@ String _formatMonthDay(DateTime date) {
 }
 
 DateTime? _parseStrictDate(String value) {
-  final Match? match = RegExp(
-    r'^(\d{4})-(\d{2})-(\d{2})$',
-  ).firstMatch(value);
+  final Match? match = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$').firstMatch(value);
 
   if (match == null) {
     return null;
   }
 
-  final int? year = int.tryParse(
-    match.group(1)!,
-  );
+  final int? year = int.tryParse(match.group(1)!);
 
-  final int? month = int.tryParse(
-    match.group(2)!,
-  );
+  final int? month = int.tryParse(match.group(2)!);
 
-  final int? day = int.tryParse(
-    match.group(3)!,
-  );
+  final int? day = int.tryParse(match.group(3)!);
 
-  if (year == null ||
-      month == null ||
-      day == null) {
+  if (year == null || month == null || day == null) {
     return null;
   }
 
-  final DateTime parsed = DateTime.utc(
-    year,
-    month,
-    day,
-  );
+  final DateTime parsed = DateTime.utc(year, month, day);
 
-  if (parsed.year != year ||
-      parsed.month != month ||
-      parsed.day != day) {
+  if (parsed.year != year || parsed.month != month || parsed.day != day) {
     return null;
   }
 
@@ -1531,43 +1231,23 @@ DateTime? _parseStrictDate(String value) {
 }
 
 void _printUsage() {
-  stdout.writeln(
-    'One Nation Faith Lectionary Fetcher',
-  );
+  stdout.writeln('One Nation Faith Lectionary Fetcher');
   stdout.writeln();
-  stdout.writeln(
-    'Fetch an entire year into a candidate CSV:',
-  );
-  stdout.writeln(
-    '  dart run tool/fetch_lectionary.dart 2026',
-  );
+  stdout.writeln('Fetch an entire year into a candidate CSV:');
+  stdout.writeln('  dart run tool/fetch_lectionary.dart 2026');
   stdout.writeln();
-  stdout.writeln(
-    'Fetch a smaller test range:',
-  );
+  stdout.writeln('Fetch a smaller test range:');
   stdout.writeln(
     '  dart run tool/fetch_lectionary.dart 2026 '
     '--from 2026-07-28 --to 2026-08-02',
   );
   stdout.writeln();
-  stdout.writeln(
-    'Options:',
-  );
-  stdout.writeln(
-    '  --from DATE          First date to fetch.',
-  );
-  stdout.writeln(
-    '  --to DATE            Last date to fetch.',
-  );
-  stdout.writeln(
-    '  --output PATH        Candidate CSV path.',
-  );
-  stdout.writeln(
-    '  --report PATH        Review-report path.',
-  );
-  stdout.writeln(
-    '  --base-url URL       Override the API URL.',
-  );
+  stdout.writeln('Options:');
+  stdout.writeln('  --from DATE          First date to fetch.');
+  stdout.writeln('  --to DATE            Last date to fetch.');
+  stdout.writeln('  --output PATH        Candidate CSV path.');
+  stdout.writeln('  --report PATH        Review-report path.');
+  stdout.writeln('  --base-url URL       Override the API URL.');
   stdout.writeln(
     '  --concurrency N      Simultaneous requests '
     '(default 6).',
@@ -1580,9 +1260,7 @@ void _printUsage() {
     '  --force              Replace existing '
     'candidate files.',
   );
-  stdout.writeln(
-    '  --help               Show this help.',
-  );
+  stdout.writeln('  --help               Show this help.');
 }
 
 class FetchOptions {
@@ -1610,11 +1288,8 @@ class FetchOptions {
   final bool force;
   final bool showHelp;
 
-  static FetchOptions parse(
-    List<String> arguments,
-  ) {
-    if (arguments.contains('--help') ||
-        arguments.contains('-h')) {
+  static FetchOptions parse(List<String> arguments) {
+    if (arguments.contains('--help') || arguments.contains('-h')) {
       final int year = DateTime.now().year;
 
       return FetchOptions(
@@ -1645,9 +1320,7 @@ class FetchOptions {
     bool includePartial = false;
     bool force = false;
 
-    for (int index = 0;
-        index < arguments.length;
-        index++) {
+    for (int index = 0; index < arguments.length; index++) {
       final String argument = arguments[index];
 
       if (argument == '--force') {
@@ -1662,9 +1335,7 @@ class FetchOptions {
 
       if (argument == '--from') {
         if (index + 1 >= arguments.length) {
-          throw const FetchException(
-            '--from requires a date.',
-          );
+          throw const FetchException('--from requires a date.');
         }
 
         final String value = arguments[++index];
@@ -1672,25 +1343,19 @@ class FetchOptions {
         startDate = _parseStrictDate(value);
 
         if (startDate == null) {
-          throw FetchException(
-            'Invalid --from date: $value',
-          );
+          throw FetchException('Invalid --from date: $value');
         }
 
         continue;
       }
 
       if (argument.startsWith('--from=')) {
-        final String value = argument.substring(
-          '--from='.length,
-        );
+        final String value = argument.substring('--from='.length);
 
         startDate = _parseStrictDate(value);
 
         if (startDate == null) {
-          throw FetchException(
-            'Invalid --from date: $value',
-          );
+          throw FetchException('Invalid --from date: $value');
         }
 
         continue;
@@ -1698,9 +1363,7 @@ class FetchOptions {
 
       if (argument == '--to') {
         if (index + 1 >= arguments.length) {
-          throw const FetchException(
-            '--to requires a date.',
-          );
+          throw const FetchException('--to requires a date.');
         }
 
         final String value = arguments[++index];
@@ -1708,25 +1371,19 @@ class FetchOptions {
         endDate = _parseStrictDate(value);
 
         if (endDate == null) {
-          throw FetchException(
-            'Invalid --to date: $value',
-          );
+          throw FetchException('Invalid --to date: $value');
         }
 
         continue;
       }
 
       if (argument.startsWith('--to=')) {
-        final String value = argument.substring(
-          '--to='.length,
-        );
+        final String value = argument.substring('--to='.length);
 
         endDate = _parseStrictDate(value);
 
         if (endDate == null) {
-          throw FetchException(
-            'Invalid --to date: $value',
-          );
+          throw FetchException('Invalid --to date: $value');
         }
 
         continue;
@@ -1734,9 +1391,7 @@ class FetchOptions {
 
       if (argument == '--output') {
         if (index + 1 >= arguments.length) {
-          throw const FetchException(
-            '--output requires a path.',
-          );
+          throw const FetchException('--output requires a path.');
         }
 
         outputPath = arguments[++index];
@@ -1744,17 +1399,13 @@ class FetchOptions {
       }
 
       if (argument.startsWith('--output=')) {
-        outputPath = argument.substring(
-          '--output='.length,
-        );
+        outputPath = argument.substring('--output='.length);
         continue;
       }
 
       if (argument == '--report') {
         if (index + 1 >= arguments.length) {
-          throw const FetchException(
-            '--report requires a path.',
-          );
+          throw const FetchException('--report requires a path.');
         }
 
         reportPath = arguments[++index];
@@ -1762,17 +1413,13 @@ class FetchOptions {
       }
 
       if (argument.startsWith('--report=')) {
-        reportPath = argument.substring(
-          '--report='.length,
-        );
+        reportPath = argument.substring('--report='.length);
         continue;
       }
 
       if (argument == '--base-url') {
         if (index + 1 >= arguments.length) {
-          throw const FetchException(
-            '--base-url requires a URL.',
-          );
+          throw const FetchException('--base-url requires a URL.');
         }
 
         baseUrl = arguments[++index];
@@ -1780,25 +1427,20 @@ class FetchOptions {
       }
 
       if (argument.startsWith('--base-url=')) {
-        baseUrl = argument.substring(
-          '--base-url='.length,
-        );
+        baseUrl = argument.substring('--base-url='.length);
         continue;
       }
 
       if (argument == '--concurrency') {
         if (index + 1 >= arguments.length) {
-          throw const FetchException(
-            '--concurrency requires a number.',
-          );
+          throw const FetchException('--concurrency requires a number.');
         }
 
         final String value = arguments[++index];
 
         concurrency = int.tryParse(value) ?? 0;
 
-        if (concurrency < 1 ||
-            concurrency > 12) {
+        if (concurrency < 1 || concurrency > 12) {
           throw FetchException(
             'Invalid concurrency: $value. '
             'Use a value from 1 through 12.',
@@ -1808,17 +1450,12 @@ class FetchOptions {
         continue;
       }
 
-      if (argument.startsWith(
-        '--concurrency=',
-      )) {
-        final String value = argument.substring(
-          '--concurrency='.length,
-        );
+      if (argument.startsWith('--concurrency=')) {
+        final String value = argument.substring('--concurrency='.length);
 
         concurrency = int.tryParse(value) ?? 0;
 
-        if (concurrency < 1 ||
-            concurrency > 12) {
+        if (concurrency < 1 || concurrency > 12) {
           throw FetchException(
             'Invalid concurrency: $value. '
             'Use a value from 1 through 12.',
@@ -1829,25 +1466,17 @@ class FetchOptions {
       }
 
       if (argument.startsWith('-')) {
-        throw FetchException(
-          'Unknown option: $argument',
-        );
+        throw FetchException('Unknown option: $argument');
       }
 
       if (year != null) {
-        throw const FetchException(
-          'Only one year may be supplied.',
-        );
+        throw const FetchException('Only one year may be supplied.');
       }
 
       year = int.tryParse(argument);
 
-      if (year == null ||
-          year < 1900 ||
-          year > 3000) {
-        throw FetchException(
-          'Invalid year: $argument',
-        );
+      if (year == null || year < 1900 || year > 3000) {
+        throw FetchException('Invalid year: $argument');
       }
     }
 
@@ -1859,52 +1488,36 @@ class FetchOptions {
       );
     }
 
-    startDate ??= DateTime.utc(
-      year,
-      1,
-      1,
-    );
+    startDate ??= DateTime.utc(year, 1, 1);
 
-    endDate ??= DateTime.utc(
-      year,
-      12,
-      31,
-    );
+    endDate ??= DateTime.utc(year, 12, 31);
 
     if (startDate.year != year) {
-      throw FetchException(
-        '--from must be within $year.',
-      );
+      throw FetchException('--from must be within $year.');
     }
 
     if (endDate.year != year) {
-      throw FetchException(
-        '--to must be within $year.',
-      );
+      throw FetchException('--to must be within $year.');
     }
 
     if (endDate.isBefore(startDate)) {
-      throw const FetchException(
-        '--to cannot come before --from.',
-      );
+      throw const FetchException('--to cannot come before --from.');
     }
 
-    final String normalizedBaseUrl =
-        baseUrl.endsWith('/')
-            ? baseUrl.substring(
-                0,
-                baseUrl.length - 1,
-              )
-            : baseUrl;
+    final String normalizedBaseUrl = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
 
     return FetchOptions(
       year: year,
       startDate: startDate,
       endDate: endDate,
-      outputPath: outputPath ??
+      outputPath:
+          outputPath ??
           '$_defaultOutputDirectory/'
               '${year}_fetched.csv',
-      reportPath: reportPath ??
+      reportPath:
+          reportPath ??
           '$_defaultOutputDirectory/'
               '${year}_fetch_report.txt',
       baseUrl: normalizedBaseUrl,
@@ -1931,14 +1544,10 @@ class SourceReadingDefinition {
 }
 
 class HttpJsonClient {
-  HttpJsonClient({
-    required this.baseUrl,
-  }) {
-    _client.connectionTimeout =
-        const Duration(seconds: 20);
+  HttpJsonClient({required this.baseUrl}) {
+    _client.connectionTimeout = const Duration(seconds: 20);
 
-    _client.userAgent =
-        'OneNationFaithLectionaryFetcher/1.0';
+    _client.userAgent = 'OneNationFaithLectionaryFetcher/1.0';
   }
 
   final String baseUrl;
@@ -1949,54 +1558,35 @@ class HttpJsonClient {
   DateTime? _lastUsccbRequestAt;
   bool _usccbBlocked = false;
 
-  Future<Map<String, dynamic>?> getJson(
-    String path,
-  ) async {
-    final Uri uri = Uri.parse(
-      '$baseUrl$path',
-    );
+  Future<Map<String, dynamic>?> getJson(String path) async {
+    final Uri uri = Uri.parse('$baseUrl$path');
 
     Object? lastError;
 
-    for (int attempt = 1;
-        attempt <= 3;
-        attempt++) {
+    for (int attempt = 1; attempt <= 3; attempt++) {
       try {
-        final HttpClientRequest request =
-            await _client.getUrl(uri);
+        final HttpClientRequest request = await _client.getUrl(uri);
 
-        request.headers.set(
-          HttpHeaders.acceptHeader,
-          'application/json',
-        );
+        request.headers.set(HttpHeaders.acceptHeader, 'application/json');
 
-        final HttpClientResponse response =
-            await request.close();
+        final HttpClientResponse response = await request.close();
 
-        final String responseBody =
-            await utf8.decoder
-                .bind(response)
-                .join();
+        final String responseBody = await utf8.decoder.bind(response).join();
 
-        if (response.statusCode ==
-            HttpStatus.notFound) {
+        if (response.statusCode == HttpStatus.notFound) {
           return null;
         }
 
-        if (response.statusCode < 200 ||
-            response.statusCode >= 300) {
+        if (response.statusCode < 200 || response.statusCode >= 300) {
           throw FetchException(
             'HTTP ${response.statusCode} '
             'for $path.',
           );
         }
 
-        final Object? decoded = jsonDecode(
-          responseBody,
-        );
+        final Object? decoded = jsonDecode(responseBody);
 
-        final Map<String, dynamic>? json =
-            _asStringMap(decoded);
+        final Map<String, dynamic>? json = _asStringMap(decoded);
 
         if (json == null) {
           throw FetchException(
@@ -2010,11 +1600,7 @@ class HttpJsonClient {
         lastError = error;
 
         if (attempt < 3) {
-          await Future<void>.delayed(
-            Duration(
-              milliseconds: 500 * attempt,
-            ),
-          );
+          await Future<void>.delayed(Duration(milliseconds: 500 * attempt));
         }
       }
     }
@@ -2025,45 +1611,30 @@ class HttpJsonClient {
     );
   }
 
-  Future<String?> getTextUrl(
-    String url, {
-    File? cacheFile,
-  }) {
-    final Completer<String?> completer =
-        Completer<String?>();
+  Future<String?> getTextUrl(String url, {File? cacheFile}) {
+    final Completer<String?> completer = Completer<String?>();
 
-    _usccbQueue = _usccbQueue.then(
-      (_) async {
-        try {
-          final String? result =
-              await _getTextUrlSerial(
-            url,
-            cacheFile: cacheFile,
-          );
+    _usccbQueue = _usccbQueue.then((_) async {
+      try {
+        final String? result = await _getTextUrlSerial(
+          url,
+          cacheFile: cacheFile,
+        );
 
-          completer.complete(result);
-        } catch (error, stackTrace) {
-          completer.completeError(
-            error,
-            stackTrace,
-          );
-        }
-      },
-    );
+        completer.complete(result);
+      } catch (error, stackTrace) {
+        completer.completeError(error, stackTrace);
+      }
+    });
 
     return completer.future;
   }
 
-  Future<String?> _getTextUrlSerial(
-    String url, {
-    File? cacheFile,
-  }) async {
+  Future<String?> _getTextUrlSerial(String url, {File? cacheFile}) async {
     if (cacheFile != null &&
         cacheFile.existsSync() &&
         cacheFile.lengthSync() > 0) {
-      return cacheFile.readAsStringSync(
-        encoding: utf8,
-      );
+      return cacheFile.readAsStringSync(encoding: utf8);
     }
 
     if (_usccbBlocked) {
@@ -2077,29 +1648,22 @@ class HttpJsonClient {
     final Uri uri = Uri.parse(url);
     Object? lastError;
 
-    for (int attempt = 1;
-        attempt <= 3;
-        attempt++) {
+    for (int attempt = 1; attempt <= 3; attempt++) {
       try {
         final DateTime now = DateTime.now();
-        final DateTime? lastRequest =
-            _lastUsccbRequestAt;
+        final DateTime? lastRequest = _lastUsccbRequestAt;
 
         if (lastRequest != null) {
-          final Duration elapsed =
-              now.difference(lastRequest);
+          final Duration elapsed = now.difference(lastRequest);
 
           if (elapsed < _usccbMinimumDelay) {
-            await Future<void>.delayed(
-              _usccbMinimumDelay - elapsed,
-            );
+            await Future<void>.delayed(_usccbMinimumDelay - elapsed);
           }
         }
 
         _lastUsccbRequestAt = DateTime.now();
 
-        final HttpClientRequest request =
-            await _client.getUrl(uri);
+        final HttpClientRequest request = await _client.getUrl(uri);
 
         request.headers.set(
           HttpHeaders.acceptHeader,
@@ -2112,26 +1676,17 @@ class HttpJsonClient {
           'AppleWebKit/537.36 Chrome/142.0 Safari/537.36',
         );
 
-        request.headers.set(
-          HttpHeaders.acceptLanguageHeader,
-          'en-US,en;q=0.9',
-        );
+        request.headers.set(HttpHeaders.acceptLanguageHeader, 'en-US,en;q=0.9');
 
-        final HttpClientResponse response =
-            await request.close();
+        final HttpClientResponse response = await request.close();
 
-        final String responseBody =
-            await utf8.decoder
-                .bind(response)
-                .join();
+        final String responseBody = await utf8.decoder.bind(response).join();
 
-        if (response.statusCode ==
-            HttpStatus.notFound) {
+        if (response.statusCode == HttpStatus.notFound) {
           return null;
         }
 
-        if (response.statusCode ==
-                HttpStatus.forbidden ||
+        if (response.statusCode == HttpStatus.forbidden ||
             response.statusCode == 429) {
           _usccbBlocked = true;
 
@@ -2143,8 +1698,7 @@ class HttpJsonClient {
           );
         }
 
-        if (response.statusCode < 200 ||
-            response.statusCode >= 300) {
+        if (response.statusCode < 200 || response.statusCode >= 300) {
           throw FetchException(
             'HTTP ${response.statusCode} '
             'for $url.',
@@ -2152,9 +1706,7 @@ class HttpJsonClient {
         }
 
         if (cacheFile != null) {
-          await cacheFile.parent.create(
-            recursive: true,
-          );
+          await cacheFile.parent.create(recursive: true);
 
           cacheFile.writeAsStringSync(
             responseBody,
@@ -2172,11 +1724,7 @@ class HttpJsonClient {
         }
 
         if (attempt < 3) {
-          await Future<void>.delayed(
-            Duration(
-              seconds: 3 * attempt,
-            ),
-          );
+          await Future<void>.delayed(Duration(seconds: 3 * attempt));
         }
       }
     }
@@ -2188,26 +1736,15 @@ class HttpJsonClient {
   }
 
   void close() {
-    _client.close(
-      force: true,
-    );
+    _client.close(force: true);
   }
 }
 
 class BibleCatalog {
-  BibleCatalog._({
-    required this.booksByCode,
-    required this.aliases,
-  }) {
+  BibleCatalog._({required this.booksByCode, required this.aliases}) {
     _sortedAliases = aliases.keys.toList()
       ..sort(
-        (
-          String first,
-          String second,
-        ) =>
-            second.length.compareTo(
-          first.length,
-        ),
+        (String first, String second) => second.length.compareTo(first.length),
       );
   }
 
@@ -2219,17 +1756,14 @@ class BibleCatalog {
 
   int get bookCount => booksByCode.length;
 
-  static BibleCatalog load(
-    File databaseFile,
-  ) {
+  static BibleCatalog load(File databaseFile) {
     final Database database = sqlite3.open(
       databaseFile.path,
       mode: OpenMode.readOnly,
     );
 
     try {
-      final ResultSet bookRows = database.select(
-        '''
+      final ResultSet bookRows = database.select('''
 SELECT
   id,
   usfm_code,
@@ -2238,42 +1772,30 @@ SELECT
   short_name
 FROM bible_books
 ORDER BY canonical_order
-''',
-      );
+''');
 
-      final Map<int, BibleBookInfo> booksById =
-          <int, BibleBookInfo>{};
+      final Map<int, BibleBookInfo> booksById = <int, BibleBookInfo>{};
 
-      final Map<String, BibleBookInfo>
-          booksByCode =
-          <String, BibleBookInfo>{};
+      final Map<String, BibleBookInfo> booksByCode = <String, BibleBookInfo>{};
 
       for (final Row row in bookRows) {
         final int id = row['id'] as int;
 
-        final String code = row['usfm_code']
-            .toString()
-            .trim()
-            .toUpperCase();
+        final String code = row['usfm_code'].toString().trim().toUpperCase();
 
-        final BibleBookInfo book =
-            BibleBookInfo(
+        final BibleBookInfo book = BibleBookInfo(
           id: id,
           code: code,
           name: row['name'].toString(),
-          fullName:
-              row['full_name'].toString(),
-          shortName:
-              row['short_name'].toString(),
+          fullName: row['full_name'].toString(),
+          shortName: row['short_name'].toString(),
         );
 
         booksById[id] = book;
         booksByCode[code] = book;
       }
 
-      final ResultSet verseRows =
-          database.select(
-        '''
+      final ResultSet verseRows = database.select('''
 SELECT
   book_id,
   chapter,
@@ -2285,22 +1807,16 @@ GROUP BY
 ORDER BY
   book_id,
   chapter
-''',
-      );
+''');
 
       for (final Row row in verseRows) {
-        final int bookId =
-            row['book_id'] as int;
+        final int bookId = row['book_id'] as int;
 
-        final int chapter =
-            row['chapter'] as int;
+        final int chapter = row['chapter'] as int;
 
-        final int maximumVerse =
-            row['maximum_verse'] as int;
+        final int maximumVerse = row['maximum_verse'] as int;
 
-        booksById[bookId]
-            ?.maximumVerseByChapter[chapter] =
-            maximumVerse;
+        booksById[bookId]?.maximumVerseByChapter[chapter] = maximumVerse;
       }
 
       if (booksByCode.isEmpty) {
@@ -2310,28 +1826,19 @@ ORDER BY
         );
       }
 
-      final Map<String, BibleBookInfo> aliases =
-          <String, BibleBookInfo>{};
+      final Map<String, BibleBookInfo> aliases = <String, BibleBookInfo>{};
 
-      void addAlias(
-        String alias,
-        BibleBookInfo book,
-      ) {
-        final String normalized =
-            _normalizeBookAlias(alias);
+      void addAlias(String alias, BibleBookInfo book) {
+        final String normalized = _normalizeBookAlias(alias);
 
         if (normalized.isEmpty) {
           return;
         }
 
-        aliases.putIfAbsent(
-          normalized,
-          () => book,
-        );
+        aliases.putIfAbsent(normalized, () => book);
       }
 
-      for (final BibleBookInfo book
-          in booksByCode.values) {
+      for (final BibleBookInfo book in booksByCode.values) {
         addAlias(book.code, book);
         addAlias(book.name, book);
         addAlias(book.fullName, book);
@@ -2344,8 +1851,7 @@ ORDER BY
       ) {
         BibleBookInfo? book;
 
-        for (final String code
-            in possibleCodes) {
+        for (final String code in possibleCodes) {
           book = booksByCode[code];
 
           if (book != null) {
@@ -2357,19 +1863,14 @@ ORDER BY
           return;
         }
 
-        for (final String alias
-            in additionalAliases) {
+        for (final String alias in additionalAliases) {
           addAlias(alias, book);
         }
       }
 
       addAliasesForCode(
         const <String>['PSA'],
-        const <String>[
-          'Psalm',
-          'Psalms',
-          'Ps',
-        ],
+        const <String>['Psalm', 'Psalms', 'Ps'],
       );
 
       addAliasesForCode(
@@ -2384,74 +1885,40 @@ ORDER BY
 
       addAliasesForCode(
         const <String>['SIR'],
-        const <String>[
-          'Sirach',
-          'Ecclesiasticus',
-        ],
+        const <String>['Sirach', 'Ecclesiasticus'],
       );
 
       addAliasesForCode(
         const <String>['REV'],
-        const <String>[
-          'Revelation',
-          'Apocalypse',
-        ],
+        const <String>['Revelation', 'Apocalypse'],
       );
 
-      addAliasesForCode(
-        const <String>['ESG', 'EST'],
-        const <String>[
-          'Esther',
-        ],
-      );
+      addAliasesForCode(const <String>['ESG', 'EST'], const <String>['Esther']);
 
-      addAliasesForCode(
-        const <String>['DAG', 'DAN'],
-        const <String>[
-          'Daniel',
-        ],
-      );
+      addAliasesForCode(const <String>['DAG', 'DAN'], const <String>['Daniel']);
 
-      _addCommonAbbreviations(
-        booksByCode,
-        addAlias,
-      );
+      _addCommonAbbreviations(booksByCode, addAlias);
 
-      return BibleCatalog._(
-        booksByCode: booksByCode,
-        aliases: aliases,
-      );
+      return BibleCatalog._(booksByCode: booksByCode, aliases: aliases);
     } finally {
       database.close();
     }
   }
 
-  BookMatch? matchBook(
-    String reference,
-  ) {
-    final String cleaned =
-        _cleanReferenceForBookMatching(
-      reference,
-    );
+  BookMatch? matchBook(String reference) {
+    final String cleaned = _cleanReferenceForBookMatching(reference);
 
-    final String lower =
-        cleaned.toLowerCase();
+    final String lower = cleaned.toLowerCase();
 
-    for (final String alias
-        in _sortedAliases) {
+    for (final String alias in _sortedAliases) {
       if (lower == alias) {
-        return BookMatch(
-          book: aliases[alias]!,
-          remainder: '',
-        );
+        return BookMatch(book: aliases[alias]!, remainder: '');
       }
 
       if (lower.startsWith('$alias ')) {
         return BookMatch(
           book: aliases[alias]!,
-          remainder: cleaned
-              .substring(alias.length)
-              .trim(),
+          remainder: cleaned.substring(alias.length).trim(),
         );
       }
     }
@@ -2461,14 +1928,9 @@ ORDER BY
 
   static void _addCommonAbbreviations(
     Map<String, BibleBookInfo> booksByCode,
-    void Function(
-      String alias,
-      BibleBookInfo book,
-    ) addAlias,
+    void Function(String alias, BibleBookInfo book) addAlias,
   ) {
-    const Map<String, List<String>>
-        abbreviations =
-        <String, List<String>>{
+    const Map<String, List<String>> abbreviations = <String, List<String>>{
       'GEN': <String>['Gen'],
       'EXO': <String>['Ex', 'Exod'],
       'LEV': <String>['Lev'],
@@ -2535,47 +1997,33 @@ ORDER BY
       'REV': <String>['Rev'],
     };
 
-    for (final MapEntry<String, List<String>>
-        entry in abbreviations.entries) {
-      final BibleBookInfo? book =
-          booksByCode[entry.key];
+    for (final MapEntry<String, List<String>> entry in abbreviations.entries) {
+      final BibleBookInfo? book = booksByCode[entry.key];
 
       if (book == null) {
         continue;
       }
 
-      for (final String alias
-          in entry.value) {
+      for (final String alias in entry.value) {
         addAlias(alias, book);
       }
     }
   }
 }
 
-String _cleanReferenceForBookMatching(
-  String value,
-) {
+String _cleanReferenceForBookMatching(String value) {
   return value
       .replaceAll('\u00A0', ' ')
       .replaceAll('.', '')
-      .replaceAll(
-        RegExp(r'\s+'),
-        ' ',
-      )
+      .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
 }
 
 String _normalizeBookAlias(String value) {
   return _cleanReferenceForBookMatching(value)
       .toLowerCase()
-      .replaceAll(
-        RegExp(r'[^a-z0-9 ]'),
-        '',
-      )
-      .replaceAll(
-        RegExp(r'\s+'),
-        ' ',
-      )
+      .replaceAll(RegExp(r'[^a-z0-9 ]'), '')
+      .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
 }
 
@@ -2594,16 +2042,12 @@ class BibleBookInfo {
   final String fullName;
   final String shortName;
 
-  final Map<int, int> maximumVerseByChapter =
-      <int, int>{};
+  final Map<int, int> maximumVerseByChapter = <int, int>{};
 
-  int get chapterCount =>
-      maximumVerseByChapter.length;
+  int get chapterCount => maximumVerseByChapter.length;
 
   bool containsChapter(int chapter) {
-    return maximumVerseByChapter.containsKey(
-      chapter,
-    );
+    return maximumVerseByChapter.containsKey(chapter);
   }
 
   int? maximumVerse(int chapter) {
@@ -2612,10 +2056,7 @@ class BibleBookInfo {
 }
 
 class BookMatch {
-  const BookMatch({
-    required this.book,
-    required this.remainder,
-  });
+  const BookMatch({required this.book, required this.remainder});
 
   final BibleBookInfo book;
   final String remainder;
@@ -2626,25 +2067,17 @@ class ReferenceParser {
 
   final BibleCatalog catalog;
 
-  ReferenceParseResult parse(
-    String reference,
-  ) {
-    final List<ScriptureRange> ranges =
-        <ScriptureRange>[];
+  ReferenceParseResult parse(String reference) {
+    final List<ScriptureRange> ranges = <ScriptureRange>[];
 
-    final List<String> warnings =
-        <String>[];
+    final List<String> warnings = <String>[];
 
-    final List<String> errors =
-        <String>[];
+    final List<String> errors = <String>[];
 
-    final BookMatch? bookMatch =
-        catalog.matchBook(reference);
+    final BookMatch? bookMatch = catalog.matchBook(reference);
 
     if (bookMatch == null) {
-      errors.add(
-        'The Bible book could not be recognized.',
-      );
+      errors.add('The Bible book could not be recognized.');
 
       return ReferenceParseResult(
         ranges: ranges,
@@ -2653,24 +2086,14 @@ class ReferenceParser {
       );
     }
 
-    final BibleBookInfo book =
-        bookMatch.book;
+    final BibleBookInfo book = bookMatch.book;
 
-    String remainder =
-        bookMatch.remainder
-            .replaceAll('–', '-')
-            .replaceAll('—', '-')
-            .replaceAll(
-              RegExp(
-                r'\s+(?:and|AND)\s+',
-              ),
-              ', ',
-            )
-            .replaceAll(
-              RegExp(r'\s+'),
-              ' ',
-            )
-            .trim();
+    String remainder = bookMatch.remainder
+        .replaceAll('–', '-')
+        .replaceAll('—', '-')
+        .replaceAll(RegExp(r'\s+(?:and|AND)\s+'), ', ')
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
 
     if (remainder.isEmpty) {
       errors.add(
@@ -2685,9 +2108,7 @@ class ReferenceParser {
       );
     }
 
-    if (remainder.contains(
-      RegExp(r'\b(?:or|OR)\b'),
-    )) {
+    if (remainder.contains(RegExp(r'\b(?:or|OR)\b'))) {
       errors.add(
         'The reference contains an unresolved '
         'alternative reading.',
@@ -2707,8 +2128,7 @@ class ReferenceParser {
       );
     }
 
-    final List<String> segments =
-        remainder.split(';');
+    final List<String> segments = remainder.split(';');
 
     int? currentChapter;
 
@@ -2726,12 +2146,9 @@ class ReferenceParser {
       String verseSpecification;
 
       if (chapterMatch != null) {
-        currentChapter = int.parse(
-          chapterMatch.group(1)!,
-        );
+        currentChapter = int.parse(chapterMatch.group(1)!);
 
-        verseSpecification =
-            chapterMatch.group(2)!.trim();
+        verseSpecification = chapterMatch.group(2)!.trim();
       } else {
         if (currentChapter == null) {
           if (book.chapterCount == 1) {
@@ -2748,69 +2165,46 @@ class ReferenceParser {
         verseSpecification = segment;
       }
 
-      final List<String> verseTokens =
-          verseSpecification.split(',');
+      final List<String> verseTokens = verseSpecification.split(',');
 
       for (String token in verseTokens) {
-        token = token
-            .replaceAll(
-              RegExp(r'\([^)]*\)'),
-              '',
-            )
-            .trim();
+        token = token.replaceAll(RegExp(r'\([^)]*\)'), '').trim();
 
         if (token.isEmpty) {
           continue;
         }
 
-        final Match? tokenChapterMatch =
-            RegExp(
+        final Match? tokenChapterMatch = RegExp(
           r'^(\d+)\s*:\s*(.+)$',
         ).firstMatch(token);
 
         if (tokenChapterMatch != null) {
-          currentChapter = int.parse(
-            tokenChapterMatch.group(1)!,
-          );
+          currentChapter = int.parse(tokenChapterMatch.group(1)!);
 
-          token = tokenChapterMatch
-              .group(2)!
-              .trim();
+          token = tokenChapterMatch.group(2)!.trim();
         }
 
-        final int dashIndex =
-            token.indexOf('-');
+        final int dashIndex = token.indexOf('-');
 
-        final String startText =
-            dashIndex < 0
-                ? token
-                : token
-                    .substring(0, dashIndex)
-                    .trim();
+        final String startText = dashIndex < 0
+            ? token
+            : token.substring(0, dashIndex).trim();
 
-        final String endText =
-            dashIndex < 0
-                ? token
-                : token
-                    .substring(dashIndex + 1)
-                    .trim();
+        final String endText = dashIndex < 0
+            ? token
+            : token.substring(dashIndex + 1).trim();
 
-        final VerseEndpoint? startEndpoint =
-            _parseEndpoint(
+        final VerseEndpoint? startEndpoint = _parseEndpoint(
           startText,
           defaultChapter: currentChapter,
         );
 
-        final VerseEndpoint? endEndpoint =
-            _parseEndpoint(
+        final VerseEndpoint? endEndpoint = _parseEndpoint(
           endText,
-          defaultChapter:
-              startEndpoint?.chapter ??
-                  currentChapter,
+          defaultChapter: startEndpoint?.chapter ?? currentChapter,
         );
 
-        if (startEndpoint == null ||
-            endEndpoint == null) {
+        if (startEndpoint == null || endEndpoint == null) {
           errors.add(
             'Could not parse verse token '
             '"$token".',
@@ -2820,16 +2214,14 @@ class ReferenceParser {
 
         currentChapter = startEndpoint.chapter;
 
-        if (startEndpoint.suffix != null ||
-            endEndpoint.suffix != null) {
+        if (startEndpoint.suffix != null || endEndpoint.suffix != null) {
           warnings.add(
             'Verse-letter notation in "$token" '
             'was expanded to complete verses.',
           );
         }
 
-        if (endEndpoint.chapter <
-            startEndpoint.chapter) {
+        if (endEndpoint.chapter < startEndpoint.chapter) {
           errors.add(
             'The range "$token" ends in an '
             'earlier chapter.',
@@ -2837,9 +2229,7 @@ class ReferenceParser {
           continue;
         }
 
-        final List<ScriptureRange>
-            expandedRanges =
-            _expandRange(
+        final List<ScriptureRange> expandedRanges = _expandRange(
           book: book,
           start: startEndpoint,
           end: endEndpoint,
@@ -2869,10 +2259,7 @@ class ReferenceParser {
     );
   }
 
-  VerseEndpoint? _parseEndpoint(
-    String value, {
-    required int? defaultChapter,
-  }) {
+  VerseEndpoint? _parseEndpoint(String value, {required int? defaultChapter}) {
     String cleaned = value.trim();
 
     int? chapter = defaultChapter;
@@ -2882,9 +2269,7 @@ class ReferenceParser {
     ).firstMatch(cleaned);
 
     if (chapterMatch != null) {
-      chapter = int.parse(
-        chapterMatch.group(1)!,
-      );
+      chapter = int.parse(chapterMatch.group(1)!);
 
       cleaned = chapterMatch.group(2)!.trim();
     }
@@ -2903,9 +2288,7 @@ class ReferenceParser {
 
     return VerseEndpoint(
       chapter: chapter,
-      verse: int.parse(
-        verseMatch.group(1)!,
-      ),
+      verse: int.parse(verseMatch.group(1)!),
       suffix: verseMatch.group(2),
     );
   }
@@ -2917,14 +2300,10 @@ class ReferenceParser {
     required List<String> errors,
     required String originalToken,
   }) {
-    final List<ScriptureRange> ranges =
-        <ScriptureRange>[];
+    final List<ScriptureRange> ranges = <ScriptureRange>[];
 
-    for (int chapter = start.chapter;
-        chapter <= end.chapter;
-        chapter++) {
-      final int? maximumVerse =
-          book.maximumVerse(chapter);
+    for (int chapter = start.chapter; chapter <= end.chapter; chapter++) {
+      final int? maximumVerse = book.maximumVerse(chapter);
 
       if (maximumVerse == null) {
         errors.add(
@@ -2934,20 +2313,13 @@ class ReferenceParser {
         continue;
       }
 
-      final int rangeStart =
-          chapter == start.chapter
-              ? start.verse
-              : 1;
+      final int rangeStart = chapter == start.chapter ? start.verse : 1;
 
-      final int rangeEnd =
-          chapter == end.chapter
-              ? end.verse
-              : maximumVerse;
+      final int rangeEnd = chapter == end.chapter ? end.verse : maximumVerse;
 
-      final int allowedMaximumVerse =
-          book.code == 'PSA'
-              ? maximumVerse + 1
-              : maximumVerse;
+      final int allowedMaximumVerse = book.code == 'PSA'
+          ? maximumVerse + 1
+          : maximumVerse;
 
       if (rangeStart < 1 ||
           rangeEnd < rangeStart ||
@@ -2981,29 +2353,18 @@ class ReferenceParser {
     required List<String> warnings,
     required List<String> errors,
   }) {
-    final Map<int, List<int>> indexesByChapter =
-        <int, List<int>>{};
+    final Map<int, List<int>> indexesByChapter = <int, List<int>>{};
 
-    for (int index = 0;
-        index < ranges.length;
-        index++) {
-      final ScriptureRange range =
-          ranges[index];
+    for (int index = 0; index < ranges.length; index++) {
+      final ScriptureRange range = ranges[index];
 
-      indexesByChapter
-          .putIfAbsent(
-            range.chapter,
-            () => <int>[],
-          )
-          .add(index);
+      indexesByChapter.putIfAbsent(range.chapter, () => <int>[]).add(index);
     }
 
-    for (final MapEntry<int, List<int>> entry
-        in indexesByChapter.entries) {
+    for (final MapEntry<int, List<int>> entry in indexesByChapter.entries) {
       final int chapter = entry.key;
 
-      final int? maximumVerse =
-          book.maximumVerse(chapter);
+      final int? maximumVerse = book.maximumVerse(chapter);
 
       if (maximumVerse == null) {
         continue;
@@ -3012,25 +2373,18 @@ class ReferenceParser {
       final List<int> indexes = entry.value;
 
       final bool needsOffset = indexes.any(
-        (int index) =>
-            ranges[index].endVerse >
-            maximumVerse,
+        (int index) => ranges[index].endVerse > maximumVerse,
       );
 
       if (!needsOffset) {
         continue;
       }
 
-      final bool canShiftByOne = indexes.every(
-        (int index) {
-          final ScriptureRange range =
-              ranges[index];
+      final bool canShiftByOne = indexes.every((int index) {
+        final ScriptureRange range = ranges[index];
 
-          return range.startVerse > 1 &&
-              range.endVerse - 1 <=
-                  maximumVerse;
-        },
-      );
+        return range.startVerse > 1 && range.endVerse - 1 <= maximumVerse;
+      });
 
       if (!canShiftByOne) {
         errors.add(
@@ -3042,8 +2396,7 @@ class ReferenceParser {
       }
 
       for (final int index in indexes) {
-        final ScriptureRange range =
-            ranges[index];
+        final ScriptureRange range = ranges[index];
 
         ranges[index] = ScriptureRange(
           bookCode: range.bookCode,
@@ -3205,8 +2558,7 @@ class FetchSummary {
     int warningCount = 0;
     int errorCount = 0;
 
-    for (final DayFetchResult result
-        in results) {
+    for (final DayFetchResult result in results) {
       if (result.readingsFetched) {
         fetchedDateCount++;
       }
@@ -3223,9 +2575,7 @@ class FetchSummary {
       requestedDateCount: requestedDateCount,
       fetchedDateCount: fetchedDateCount,
       includedDateCount: includedDateCount,
-      omittedDateCount:
-          requestedDateCount -
-              includedDateCount,
+      omittedDateCount: requestedDateCount - includedDateCount,
       outputRowCount: outputRowCount,
       warningCount: warningCount,
       errorCount: errorCount,
