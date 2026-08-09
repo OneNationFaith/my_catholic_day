@@ -67,9 +67,7 @@ void main() {
     ).firstMatch(line);
 
     if (match == null) {
-      throw FormatException(
-        'Could not parse source line:\n$line',
-      );
+      throw FormatException('Could not parse source line:\n$line');
     }
 
     final String bookCode = match.group(1)!;
@@ -84,10 +82,7 @@ void main() {
         ? verseStart
         : int.parse(verseParts.last);
 
-    sourceBooks.putIfAbsent(
-      bookCode,
-      () => <VerseRecord>[],
-    );
+    sourceBooks.putIfAbsent(bookCode, () => <VerseRecord>[]);
 
     sourceBooks[bookCode]!.add(
       VerseRecord(
@@ -100,16 +95,12 @@ void main() {
     );
   }
 
-  final int sourceVerseCount = sourceBooks.values
-      .fold<int>(
-        0,
-        (int total, List<VerseRecord> verses) =>
-            total + verses.length,
-      );
-
-  stdout.writeln(
-    'Douay-Rheims source verses: $sourceVerseCount',
+  final int sourceVerseCount = sourceBooks.values.fold<int>(
+    0,
+    (int total, List<VerseRecord> verses) => total + verses.length,
   );
+
+  stdout.writeln('Douay-Rheims source verses: $sourceVerseCount');
 
   if (sourceBooks.length != 73) {
     throw StateError(
@@ -161,8 +152,7 @@ void main() {
       ],
     );
 
-    final List<Row> oldBooks = oldDatabase.select(
-      '''
+    final List<Row> oldBooks = oldDatabase.select('''
       SELECT
         canonical_order,
         usfm_code,
@@ -173,8 +163,7 @@ void main() {
         is_deuterocanonical
       FROM bible_books
       ORDER BY canonical_order
-      ''',
-    );
+      ''');
 
     if (oldBooks.length != 73) {
       throw StateError(
@@ -186,14 +175,11 @@ void main() {
     int insertedVerseCount = 0;
 
     for (final Row oldBook in oldBooks) {
-      final String appCode =
-          oldBook['usfm_code'] as String;
+      final String appCode = oldBook['usfm_code'] as String;
 
-      final String sourceCode =
-          sourceCodeByAppCode[appCode] ?? appCode;
+      final String sourceCode = sourceCodeByAppCode[appCode] ?? appCode;
 
-      final List<VerseRecord>? verses =
-          sourceBooks[sourceCode];
+      final List<VerseRecord>? verses = sourceBooks[sourceCode];
 
       if (verses == null) {
         throw StateError(
@@ -230,7 +216,11 @@ void main() {
 
       final int bookId = database.lastInsertRowId;
 
-      for (final VerseRecord verse in verses) {
+      final List<VerseRecord> databaseVerses = appCode == 'PSA'
+          ? verses.map(_toModernPsalmNumbering).toList()
+          : verses;
+
+      for (final VerseRecord verse in databaseVerses) {
         database.execute(
           '''
           INSERT INTO bible_verses (
@@ -323,14 +313,12 @@ void main() {
       'database_version': '1',
       'translation': 'DRA',
       'source_format': 'VPL',
-      'created_at_utc':
-          DateTime.now().toUtc().toIso8601String(),
+      'created_at_utc': DateTime.now().toUtc().toIso8601String(),
       'book_count': '73',
       'verse_count': insertedVerseCount.toString(),
     };
 
-    for (final MapEntry<String, String> entry
-        in metadata.entries) {
+    for (final MapEntry<String, String> entry in metadata.entries) {
       database.execute(
         '''
         INSERT INTO database_metadata (
@@ -339,10 +327,7 @@ void main() {
         )
         VALUES (?, ?)
         ''',
-        <Object?>[
-          entry.key,
-          entry.value,
-        ],
+        <Object?>[entry.key, entry.value],
       );
     }
 
@@ -351,9 +336,7 @@ void main() {
     _verifyDatabase(database);
 
     stdout.writeln('');
-    stdout.writeln(
-      'Douay-Rheims database created successfully.',
-    );
+    stdout.writeln('Douay-Rheims database created successfully.');
     stdout.writeln(outputPath);
   } catch (error, stackTrace) {
     try {
@@ -456,29 +439,26 @@ void _createSchema(Database database) {
 
 void _verifyDatabase(Database database) {
   final int bookCount =
-      database.select(
-        'SELECT COUNT(*) AS count FROM bible_books',
-      ).first['count'] as int;
+      database
+              .select('SELECT COUNT(*) AS count FROM bible_books')
+              .first['count']
+          as int;
 
   final int verseCount =
-      database.select(
-        'SELECT COUNT(*) AS count FROM bible_verses',
-      ).first['count'] as int;
+      database
+              .select('SELECT COUNT(*) AS count FROM bible_verses')
+              .first['count']
+          as int;
 
   if (bookCount != 73) {
-    throw StateError(
-      'Verification failed: $bookCount books.',
-    );
+    throw StateError('Verification failed: $bookCount books.');
   }
 
   if (verseCount < 35000) {
-    throw StateError(
-      'Verification failed: only $verseCount verses.',
-    );
+    throw StateError('Verification failed: only $verseCount verses.');
   }
 
-  final Row genesis = database.select(
-    '''
+  final Row genesis = database.select('''
     SELECT bible_verses.text
     FROM bible_verses
     INNER JOIN bible_books
@@ -487,11 +467,9 @@ void _verifyDatabase(Database database) {
       AND bible_verses.chapter = 1
       AND bible_verses.verse_start = 1
     LIMIT 1
-    ''',
-  ).first;
+    ''').first;
 
-  final Row esther = database.select(
-    '''
+  final Row esther = database.select('''
     SELECT bible_verses.text
     FROM bible_verses
     INNER JOIN bible_books
@@ -500,11 +478,9 @@ void _verifyDatabase(Database database) {
       AND bible_verses.chapter = 4
       AND bible_verses.verse_start = 29
     LIMIT 1
-    ''',
-  ).first;
+    ''').first;
 
-  final Row daniel = database.select(
-    '''
+  final Row daniel = database.select('''
     SELECT bible_verses.text
     FROM bible_verses
     INNER JOIN bible_books
@@ -513,8 +489,7 @@ void _verifyDatabase(Database database) {
       AND bible_verses.chapter = 13
       AND bible_verses.verse_start = 62
     LIMIT 1
-    ''',
-  ).first;
+    ''').first;
 
   stdout.writeln('');
   stdout.writeln('Verification complete:');
@@ -541,3 +516,58 @@ class VerseRecord {
   final String text;
 }
 
+VerseRecord _toModernPsalmNumbering(VerseRecord verse) {
+  int chapter = verse.chapter;
+  int startVerse = verse.startVerse;
+  int endVerse = verse.endVerse;
+
+  if (chapter <= 8 || chapter >= 148) {
+    return verse;
+  }
+
+  if (chapter == 9) {
+    if (startVerse <= 21) {
+      return verse;
+    }
+
+    chapter = 10;
+    startVerse -= 21;
+    endVerse -= 21;
+  } else if (chapter >= 10 && chapter <= 112) {
+    chapter += 1;
+  } else if (chapter == 113) {
+    if (startVerse <= 8) {
+      chapter = 114;
+    } else {
+      chapter = 115;
+      startVerse -= 8;
+      endVerse -= 8;
+    }
+  } else if (chapter == 114) {
+    chapter = 116;
+  } else if (chapter == 115) {
+    chapter = 116;
+    startVerse += 9;
+    endVerse += 9;
+  } else if (chapter >= 116 && chapter <= 145) {
+    chapter += 1;
+  } else if (chapter == 146) {
+    chapter = 147;
+  } else if (chapter == 147) {
+    chapter = 147;
+    startVerse += 11;
+    endVerse += 11;
+  }
+
+  final String label = startVerse == endVerse
+      ? startVerse.toString()
+      : '$startVerse-$endVerse';
+
+  return VerseRecord(
+    chapter: chapter,
+    label: label,
+    startVerse: startVerse,
+    endVerse: endVerse,
+    text: verse.text,
+  );
+}

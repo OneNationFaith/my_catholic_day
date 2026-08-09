@@ -16,7 +16,7 @@ class ScriptureDatabase {
 
 // Increase this number whenever a newly rebuilt DRA database
 // should replace the database already installed on a device.
-  static const int _assetDatabaseVersion = 1;
+  static const int _assetDatabaseVersion = 2;
 
   sqflite.Database? _database;
 
