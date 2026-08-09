@@ -13,6 +13,12 @@ const String _bibleDatabasePath =
 const String _defaultOutputDirectory =
     'tool/source/lectionary';
 
+const String _usccbCacheDirectory =
+    'tool/cache/usccb';
+
+const Duration _usccbMinimumDelay =
+    Duration(seconds: 3);
+
 const List<String> _csvHeaders = <String>[
   'date',
   'liturgicalDay',
@@ -96,7 +102,7 @@ Future<void> main(List<String> arguments) async {
     }
 
     stdout.writeln(
-      'My Catholic Day Lectionary Fetcher',
+      'One Nation Faith Lectionary Fetcher',
     );
     stdout.writeln(
       '=================================',
@@ -540,6 +546,54 @@ Future<DayFetchResult> _fetchDate({
     );
   }
 
+  if (!_containsGospelAcclamation(readings)) {
+    final String usccbPageUrl = _optionalString(
+          readingsJson['usccbLink'],
+        ) ??
+        _buildUsccbDailyReadingsUrl(date);
+
+    try {
+      final File usccbCacheFile = File(
+        '$_usccbCacheDirectory/$dateText.html',
+      );
+
+      final String? usccbHtml =
+          await httpClient.getTextUrl(
+        usccbPageUrl,
+        cacheFile: usccbCacheFile,
+      );
+
+      if (usccbHtml == null) {
+        warnings.add(
+          'The USCCB page was not found: '
+          '$usccbPageUrl',
+        );
+      } else {
+        final String? reference =
+            _extractUsccbGospelAcclamationReference(
+          usccbHtml,
+        );
+
+        if (reference == null) {
+          warnings.add(
+            'The USCCB page supplied no '
+            'Scripture reference for the Gospel '
+            'Acclamation. The acclamation may be '
+            'text-only and requires review.',
+          );
+        } else {
+          readings['gospelAcclamation'] =
+              reference;
+        }
+      }
+    } on FetchException catch (error) {
+      warnings.add(
+        'Could not fetch the Gospel Acclamation '
+        'from USCCB: ${error.message}',
+      );
+    }
+  }
+
   final String? season = _optionalString(
     readingsJson['season'],
   );
@@ -629,7 +683,7 @@ Future<DayFetchResult> _fetchDate({
           ReferenceParser(
         bibleCatalog,
       ).parse(
-        reference,
+        _referenceForParsing(reference),
       );
 
       for (final String warning
@@ -687,15 +741,7 @@ Future<DayFetchResult> _fetchDate({
     }
   }
 
-  if (!readings.containsKey(
-        'gospelAcclamation',
-      ) &&
-      !readings.containsKey(
-        'gospel_acclamation',
-      ) &&
-      !readings.containsKey(
-        'acclamation',
-      )) {
+  if (!_containsGospelAcclamation(readings)) {
     warnings.add(
       'The source supplied no Gospel '
       'Acclamation reference.',
@@ -919,6 +965,219 @@ bool _looksLikeReference(String value) {
   return RegExp(r'\d').hasMatch(value);
 }
 
+bool _containsGospelAcclamation(
+  Map<String, dynamic> readings,
+) {
+  return readings.containsKey(
+        'gospelAcclamation',
+      ) ||
+      readings.containsKey(
+        'gospel_acclamation',
+      ) ||
+      readings.containsKey(
+        'acclamation',
+      );
+}
+
+String _buildUsccbDailyReadingsUrl(
+  DateTime date,
+) {
+  final String month =
+      date.month.toString().padLeft(2, '0');
+
+  final String day =
+      date.day.toString().padLeft(2, '0');
+
+  final String year =
+      (date.year % 100).toString().padLeft(2, '0');
+
+  return 'https://bible.usccb.org/bible/readings/'
+      '$month$day$year.cfm';
+}
+
+String? _extractUsccbGospelAcclamationReference(
+  String html,
+) {
+  final RegExp headingPattern = RegExp(
+    r'<h[1-6]\b[^>]*>(.*?)</h[1-6]>',
+    caseSensitive: false,
+    dotAll: true,
+  );
+
+  for (final RegExpMatch headingMatch
+      in headingPattern.allMatches(html)) {
+    final String heading = _htmlToPlainText(
+      headingMatch.group(1) ?? '',
+    ).toLowerCase();
+
+    if (heading != 'alleluia' &&
+        heading != 'verse before the gospel') {
+      continue;
+    }
+
+    final int sectionStart = headingMatch.end;
+
+    final RegExpMatch? nextHeading = RegExp(
+      r'<h[1-6]\b',
+      caseSensitive: false,
+    ).firstMatch(
+      html.substring(sectionStart),
+    );
+
+    final int sectionEnd = nextHeading == null
+        ? html.length
+        : sectionStart + nextHeading.start;
+
+    final String section = html.substring(
+      sectionStart,
+      sectionEnd,
+    );
+
+    final RegExp anchorPattern = RegExp(
+      r'<a\b[^>]*>(.*?)</a>',
+      caseSensitive: false,
+      dotAll: true,
+    );
+
+    for (final RegExpMatch anchorMatch
+        in anchorPattern.allMatches(section)) {
+      final String candidate = _htmlToPlainText(
+        anchorMatch.group(1) ?? '',
+      );
+
+      if (_looksLikeScriptureReference(candidate)) {
+        return candidate;
+      }
+    }
+
+    final String sectionText = _htmlToPlainText(
+      section,
+      preserveLineBreaks: true,
+    );
+
+    for (final String line
+        in sectionText.split('\n')) {
+      final String candidate = line.trim();
+
+      if (_looksLikeScriptureReference(candidate)) {
+        return candidate;
+      }
+    }
+
+    return null;
+  }
+
+  return null;
+}
+
+bool _looksLikeScriptureReference(String value) {
+  final String candidate = value.trim();
+
+  if (!_looksLikeReference(candidate)) {
+    return false;
+  }
+
+  return RegExp(
+    r'^(?:(?:cf\.?|see)\s+)?'
+    r'(?:[1-3]\s+)?[A-Za-z]'
+    r'[A-Za-z .]*\s+\d+\s*:\s*\d+',
+    caseSensitive: false,
+  ).hasMatch(candidate);
+}
+
+String _referenceForParsing(String reference) {
+  return reference.replaceFirst(
+    RegExp(
+      r'^(?:cf\.?|see)\s+',
+      caseSensitive: false,
+    ),
+    '',
+  ).trim();
+}
+
+String _htmlToPlainText(
+  String html, {
+  bool preserveLineBreaks = false,
+}) {
+  String value = html;
+
+  if (preserveLineBreaks) {
+    value = value.replaceAll(
+      RegExp(
+        r'<(?:br\s*/?|/p|/div|/li)>',
+        caseSensitive: false,
+      ),
+      '\n',
+    );
+  }
+
+  value = value.replaceAll(
+    RegExp(r'<[^>]+>', dotAll: true),
+    ' ',
+  );
+
+  value = _decodeBasicHtmlEntities(value);
+
+  if (preserveLineBreaks) {
+    return value
+        .split('\n')
+        .map(
+          (String line) => line.replaceAll(
+            RegExp(r'\s+'),
+            ' ',
+          ).trim(),
+        )
+        .where((String line) => line.isNotEmpty)
+        .join('\n');
+  }
+
+  return value.replaceAll(
+    RegExp(r'\s+'),
+    ' ',
+  ).trim();
+}
+
+String _decodeBasicHtmlEntities(String value) {
+  String decoded = value
+      .replaceAll('&nbsp;', ' ')
+      .replaceAll('&#160;', ' ')
+      .replaceAll('&amp;', '&')
+      .replaceAll('&quot;', '"')
+      .replaceAll('&#39;', "'")
+      .replaceAll('&apos;', "'")
+      .replaceAll('&ndash;', '–')
+      .replaceAll('&mdash;', '—');
+
+  decoded = decoded.replaceAllMapped(
+    RegExp(r'&#(\d+);'),
+    (Match match) {
+      final int? codePoint = int.tryParse(
+        match.group(1) ?? '',
+      );
+
+      return codePoint == null
+          ? match.group(0) ?? ''
+          : String.fromCharCode(codePoint);
+    },
+  );
+
+  decoded = decoded.replaceAllMapped(
+    RegExp(r'&#x([0-9a-fA-F]+);'),
+    (Match match) {
+      final int? codePoint = int.tryParse(
+        match.group(1) ?? '',
+        radix: 16,
+      );
+
+      return codePoint == null
+          ? match.group(0) ?? ''
+          : String.fromCharCode(codePoint);
+    },
+  );
+
+  return decoded;
+}
+
 Object? _firstMapValue(
   Map<String, dynamic> map,
   List<String> keys,
@@ -1049,7 +1308,7 @@ String _buildReport({
   final StringBuffer report = StringBuffer();
 
   report.writeln(
-    'My Catholic Day Lectionary Fetch Report',
+    'One Nation Faith Lectionary Fetch Report',
   );
   report.writeln(
     '======================================',
@@ -1127,6 +1386,11 @@ String _buildReport({
     '5. Sundays, solemnities, memorials, '
     'optional readings, transferred feasts, '
     'and local U.S. observances require review.',
+  );
+  report.writeln(
+    '6. Successful USCCB pages are cached in '
+    '$_usccbCacheDirectory. If access is blocked, '
+    'rerun later to resume from the cache.',
   );
   report.writeln();
 
@@ -1268,7 +1532,7 @@ DateTime? _parseStrictDate(String value) {
 
 void _printUsage() {
   stdout.writeln(
-    'My Catholic Day Lectionary Fetcher',
+    'One Nation Faith Lectionary Fetcher',
   );
   stdout.writeln();
   stdout.writeln(
@@ -1674,12 +1938,16 @@ class HttpJsonClient {
         const Duration(seconds: 20);
 
     _client.userAgent =
-        'MyCatholicDayLectionaryFetcher/1.0';
+        'OneNationFaithLectionaryFetcher/1.0';
   }
 
   final String baseUrl;
 
   final HttpClient _client = HttpClient();
+
+  Future<void> _usccbQueue = Future<void>.value();
+  DateTime? _lastUsccbRequestAt;
+  bool _usccbBlocked = false;
 
   Future<Map<String, dynamic>?> getJson(
     String path,
@@ -1753,6 +2021,168 @@ class HttpJsonClient {
 
     throw FetchException(
       'Request failed for $path after '
+      'three attempts: $lastError',
+    );
+  }
+
+  Future<String?> getTextUrl(
+    String url, {
+    File? cacheFile,
+  }) {
+    final Completer<String?> completer =
+        Completer<String?>();
+
+    _usccbQueue = _usccbQueue.then(
+      (_) async {
+        try {
+          final String? result =
+              await _getTextUrlSerial(
+            url,
+            cacheFile: cacheFile,
+          );
+
+          completer.complete(result);
+        } catch (error, stackTrace) {
+          completer.completeError(
+            error,
+            stackTrace,
+          );
+        }
+      },
+    );
+
+    return completer.future;
+  }
+
+  Future<String?> _getTextUrlSerial(
+    String url, {
+    File? cacheFile,
+  }) async {
+    if (cacheFile != null &&
+        cacheFile.existsSync() &&
+        cacheFile.lengthSync() > 0) {
+      return cacheFile.readAsStringSync(
+        encoding: utf8,
+      );
+    }
+
+    if (_usccbBlocked) {
+      throw const FetchException(
+        'USCCB blocked further requests earlier '
+        'in this run. Successful pages were '
+        'cached. Rerun later to resume.',
+      );
+    }
+
+    final Uri uri = Uri.parse(url);
+    Object? lastError;
+
+    for (int attempt = 1;
+        attempt <= 3;
+        attempt++) {
+      try {
+        final DateTime now = DateTime.now();
+        final DateTime? lastRequest =
+            _lastUsccbRequestAt;
+
+        if (lastRequest != null) {
+          final Duration elapsed =
+              now.difference(lastRequest);
+
+          if (elapsed < _usccbMinimumDelay) {
+            await Future<void>.delayed(
+              _usccbMinimumDelay - elapsed,
+            );
+          }
+        }
+
+        _lastUsccbRequestAt = DateTime.now();
+
+        final HttpClientRequest request =
+            await _client.getUrl(uri);
+
+        request.headers.set(
+          HttpHeaders.acceptHeader,
+          'text/html,application/xhtml+xml',
+        );
+
+        request.headers.set(
+          HttpHeaders.userAgentHeader,
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+          'AppleWebKit/537.36 Chrome/142.0 Safari/537.36',
+        );
+
+        request.headers.set(
+          HttpHeaders.acceptLanguageHeader,
+          'en-US,en;q=0.9',
+        );
+
+        final HttpClientResponse response =
+            await request.close();
+
+        final String responseBody =
+            await utf8.decoder
+                .bind(response)
+                .join();
+
+        if (response.statusCode ==
+            HttpStatus.notFound) {
+          return null;
+        }
+
+        if (response.statusCode ==
+                HttpStatus.forbidden ||
+            response.statusCode == 429) {
+          _usccbBlocked = true;
+
+          throw FetchException(
+            'HTTP ${response.statusCode} for '
+            '$url. USCCB blocked further '
+            'requests. Successful pages were '
+            'cached. Rerun later to resume.',
+          );
+        }
+
+        if (response.statusCode < 200 ||
+            response.statusCode >= 300) {
+          throw FetchException(
+            'HTTP ${response.statusCode} '
+            'for $url.',
+          );
+        }
+
+        if (cacheFile != null) {
+          await cacheFile.parent.create(
+            recursive: true,
+          );
+
+          cacheFile.writeAsStringSync(
+            responseBody,
+            encoding: utf8,
+            flush: true,
+          );
+        }
+
+        return responseBody;
+      } catch (error) {
+        lastError = error;
+
+        if (_usccbBlocked) {
+          rethrow;
+        }
+
+        if (attempt < 3) {
+          await Future<void>.delayed(
+            Duration(
+              seconds: 3 * attempt,
+            ),
+          );
+        }
+      }
+    }
+
+    throw FetchException(
+      'Request failed for $url after '
       'three attempts: $lastError',
     );
   }

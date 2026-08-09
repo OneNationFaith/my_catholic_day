@@ -17979,7 +17979,7 @@
     },
     {
       "date": "2026-08-04",
-      "liturgicalDay": "Saint John Vianney, Priest",
+      "liturgicalDay": "Saint Jean Vianney (the Cure of Ars), Priest",
       "readings": [
         {
           "kind": "firstReading",
@@ -18051,18 +18051,59 @@
           ]
         },
         {
-          "kind": "gospel",
-          "title": "Gospel",
-          "displayReference": "Matthew 14:22–36",
+          "kind": "gospelAcclamation",
+          "title": "Gospel Acclamation",
+          "displayReference": "John 1:49b",
           "response": null,
           "choiceGroup": null,
           "choiceLabel": null,
+          "ranges": [
+            {
+              "bookCode": "JHN",
+              "chapter": 1,
+              "startVerse": 49,
+              "endVerse": 49,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "gospel",
+          "title": "Gospel — Choice One",
+          "displayReference": "Matthew 14:22–36",
+          "response": null,
+          "choiceGroup": "gospel",
+          "choiceLabel": "Choice One",
           "ranges": [
             {
               "bookCode": "MAT",
               "chapter": 14,
               "startVerse": 22,
               "endVerse": 36,
+              "displayVerseOffset": 0
+            }
+          ]
+        },
+        {
+          "kind": "gospel",
+          "title": "Gospel — Choice Two",
+          "displayReference": "Matthew 15:1–2, 10–14",
+          "response": null,
+          "choiceGroup": "gospel",
+          "choiceLabel": "Choice Two",
+          "ranges": [
+            {
+              "bookCode": "MAT",
+              "chapter": 15,
+              "startVerse": 1,
+              "endVerse": 2,
+              "displayVerseOffset": 0
+            },
+            {
+              "bookCode": "MAT",
+              "chapter": 15,
+              "startVerse": 10,
+              "endVerse": 14,
               "displayVerseOffset": 0
             }
           ]
