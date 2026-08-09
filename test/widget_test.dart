@@ -2,15 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:my_catholic_day/main.dart';
 
 void main() {
-  testWidgets('My Catholic Day app builds', (
+  testWidgets('One Nation Faith app builds', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      const MyCatholicDayApp(),
+      const OneNationFaithApp(),
+    );
+
+    await tester.pump(
+      const Duration(seconds: 3),
     );
 
     expect(
-      find.byType(MyCatholicDayApp),
+      find.byType(OneNationFaithApp),
       findsOneWidget,
     );
   });
