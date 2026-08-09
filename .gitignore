@@ -50,3 +50,20 @@ app.*.map.json
 /tool/source/lectionary/*_fetched.csv
 /tool/source/lectionary/*_merged.csv
 /tool/source/lectionary/*_merged.json
+
+# Generated USCCB cache
+/tool/cache/
+
+# Downloaded Douay-Rheims source files
+/tool/data/
+
+# Local backup files
+/lib/main_before_name_setup.dart
+/main_before_splash.bak
+/tool/fetch_lectionary_before_cache.dart
+/tool/fetch_lectionary_before_usccb.dart
+/tool/source/lectionary/2026_overrides_backup.json
+
+# Local lectionary test outputs
+/tool/source/lectionary/test_*.csv
+/tool/source/lectionary/test_*_report.txt
