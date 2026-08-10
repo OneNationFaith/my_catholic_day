@@ -67,3 +67,5 @@ app.*.map.json
 # Local lectionary test outputs
 /tool/source/lectionary/test_*.csv
 /tool/source/lectionary/test_*_report.txt
+
+/tool/source/liturgical_calendar/*_calendar_draft.json

@@ -49,5 +49,6 @@ flutter:
     - assets/databases/webc.db
     - assets/databases/dra.db
     - assets/data/lectionary/
+    - assets/data/liturgical_calendar/
     - assets/images/onf_logo.png
 
