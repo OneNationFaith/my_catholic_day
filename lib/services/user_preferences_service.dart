@@ -1,0 +1,73 @@
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/util/legacy_to_async_migration_util.dart';
+
+class UserPreferencesService {
+  UserPreferencesService._();
+
+  static const String _nameKey = 'user_display_name';
+  static const String _namePromptedKey = 'user_display_name_prompted';
+  static const String _migrationCompletedKey =
+      'onf_preferences_async_migration_v1';
+
+  static const SharedPreferencesOptions _options =
+      SharedPreferencesOptions();
+
+  static final SharedPreferencesAsync _preferences =
+      SharedPreferencesAsync(options: _options);
+
+  static Future<void>? _initializationFuture;
+
+  static Future<void> initialize() {
+    return _initializationFuture ??= _migrateLegacyPreferences();
+  }
+
+  static Future<void> _migrateLegacyPreferences() async {
+    final SharedPreferences legacyPreferences =
+        await SharedPreferences.getInstance();
+
+    await migrateLegacySharedPreferencesToSharedPreferencesAsyncIfNecessary(
+      legacySharedPreferencesInstance: legacyPreferences,
+      sharedPreferencesAsyncOptions: _options,
+      migrationCompletedKey: _migrationCompletedKey,
+    );
+  }
+
+  static Future<String?> loadName() async {
+    await initialize();
+
+    final String? savedName =
+        (await _preferences.getString(_nameKey))?.trim();
+
+    if (savedName == null || savedName.isEmpty) {
+      return null;
+    }
+
+    return savedName;
+  }
+
+  static Future<bool> hasPromptedForName() async {
+    await initialize();
+    return await _preferences.getBool(_namePromptedKey) ?? false;
+  }
+
+  static Future<void> saveName(String name) async {
+    await initialize();
+
+    final String trimmedName = name.trim();
+
+    if (trimmedName.isEmpty) {
+      await skipName();
+      return;
+    }
+
+    await _preferences.setString(_nameKey, trimmedName);
+    await _preferences.setBool(_namePromptedKey, true);
+  }
+
+  static Future<void> skipName() async {
+    await initialize();
+
+    await _preferences.remove(_nameKey);
+    await _preferences.setBool(_namePromptedKey, true);
+  }
+}

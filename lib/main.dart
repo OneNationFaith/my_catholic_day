@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'services/user_preferences_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/pray_screen.dart';
 import 'screens/todays_readings_screen.dart';
@@ -9,6 +9,8 @@ import 'services/app_database.dart';
 import 'services/scripture_database.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await UserPreferencesService.initialize();
 
   await AppDatabase.instance.database;
   await ScriptureDatabase.instance.database;
@@ -274,8 +276,8 @@ class _TodayPageState extends State<TodayPage> {
   Future<void> _loadName({
     bool promptIfMissing = false,
   }) async {
-    final String? savedName = await _UserNameStore.loadName();
-    final bool hasPrompted = await _UserNameStore.hasPrompted();
+    final String? savedName = await UserPreferencesService.loadName();
+    final bool hasPrompted = await UserPreferencesService.hasPromptedForName();
 
     if (!mounted) {
       return;
@@ -379,9 +381,9 @@ class _TodayPageState extends State<TodayPage> {
     _nameDialogScheduled = false;
 
     if (result == null || result.trim().isEmpty) {
-      await _UserNameStore.skipName();
+      await UserPreferencesService.skipName();
     } else {
-      await _UserNameStore.saveName(result);
+      await UserPreferencesService.saveName(result);
     }
 
     await reloadName();
@@ -588,7 +590,7 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
   }
 
   Future<void> _loadName() async {
-    final String? savedName = await _UserNameStore.loadName();
+    final String? savedName = await UserPreferencesService.loadName();
 
     if (!mounted) {
       return;
@@ -619,7 +621,7 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
       _isSaving = true;
     });
 
-    await _UserNameStore.saveName(name);
+    await UserPreferencesService.saveName(name);
 
     if (!mounted) {
       return;
@@ -633,7 +635,7 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
       _isSaving = true;
     });
 
-    await _UserNameStore.skipName();
+    await UserPreferencesService.skipName();
 
     if (!mounted) {
       return;
@@ -714,59 +716,6 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
   }
 }
 
-class _UserNameStore {
-  static const String _nameKey = 'user_display_name';
-  static const String _promptedKey =
-      'user_display_name_prompted';
-
-  static Future<String?> loadName() async {
-    final SharedPreferences preferences =
-        await SharedPreferences.getInstance();
-
-    final String? savedName =
-        preferences.getString(_nameKey)?.trim();
-
-    if (savedName == null || savedName.isEmpty) {
-      return null;
-    }
-
-    return savedName;
-  }
-
-  static Future<bool> hasPrompted() async {
-    final SharedPreferences preferences =
-        await SharedPreferences.getInstance();
-
-    return preferences.getBool(_promptedKey) ?? false;
-  }
-
-  static Future<void> saveName(String name) async {
-    final SharedPreferences preferences =
-        await SharedPreferences.getInstance();
-
-    await preferences.setString(
-      _nameKey,
-      name.trim(),
-    );
-
-    await preferences.setBool(
-      _promptedKey,
-      true,
-    );
-  }
-
-  static Future<void> skipName() async {
-    final SharedPreferences preferences =
-        await SharedPreferences.getInstance();
-
-    await preferences.remove(_nameKey);
-
-    await preferences.setBool(
-      _promptedKey,
-      true,
-    );
-  }
-}
 
 class DailyHeroCard extends StatelessWidget {
   const DailyHeroCard({super.key});
