@@ -6,6 +6,7 @@ class UserPreferencesService {
 
   static const String _nameKey = 'user_display_name';
   static const String _namePromptedKey = 'user_display_name_prompted';
+  static const String _stateCodeKey = 'user_state_code';
   static const String _migrationCompletedKey =
       'onf_preferences_async_migration_v1';
 
@@ -69,5 +70,39 @@ class UserPreferencesService {
 
     await _preferences.remove(_nameKey);
     await _preferences.setBool(_namePromptedKey, true);
+  }
+
+  static Future<String?> loadStateCode() async {
+    await initialize();
+
+    final String? savedStateCode =
+        (await _preferences.getString(_stateCodeKey))?.trim().toUpperCase();
+
+    if (savedStateCode == null || savedStateCode.isEmpty) {
+      return null;
+    }
+
+    return savedStateCode;
+  }
+
+  static Future<void> saveStateCode(String stateCode) async {
+    await initialize();
+
+    final String normalizedStateCode = stateCode.trim().toUpperCase();
+
+    if (normalizedStateCode.isEmpty) {
+      await clearStateCode();
+      return;
+    }
+
+    await _preferences.setString(
+      _stateCodeKey,
+      normalizedStateCode,
+    );
+  }
+
+  static Future<void> clearStateCode() async {
+    await initialize();
+    await _preferences.remove(_stateCodeKey);
   }
 }
