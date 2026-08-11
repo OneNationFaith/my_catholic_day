@@ -638,7 +638,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Enter a name, or choose â€œUse Welcome instead.â€',
+            'Enter a name, or choose "Use Welcome instead".',
           ),
         ),
       );
