@@ -8,6 +8,7 @@ import 'services/catholic_day_service.dart';
 import 'models/catholic_day.dart';
 import 'services/app_database.dart';
 import 'services/scripture_database.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -59,44 +60,36 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(milliseconds: 900),
     );
 
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
+    _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
     _controller.forward();
 
-    Future<void>.delayed(
-      const Duration(milliseconds: 2500),
-      () {
-        if (!mounted) {
-          return;
-        }
+    Future<void>.delayed(const Duration(milliseconds: 2500), () {
+      if (!mounted) {
+        return;
+      }
 
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder<void>(
-            pageBuilder: (
-              BuildContext context,
-              Animation<double> animation,
-              Animation<double> secondaryAnimation,
-            ) =>
-                const MainShell(),
-            transitionDuration: const Duration(milliseconds: 450),
-            transitionsBuilder: (
-              BuildContext context,
-              Animation<double> animation,
-              Animation<double> secondaryAnimation,
-              Widget child,
-            ) {
-              return FadeTransition(
-                opacity: animation,
-                child: child,
-              );
-            },
-          ),
-        );
-      },
-    );
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder<void>(
+          pageBuilder:
+              (
+                BuildContext context,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+              ) => const MainShell(),
+          transitionDuration: const Duration(milliseconds: 450),
+          transitionsBuilder:
+              (
+                BuildContext context,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+                Widget child,
+              ) {
+                return FadeTransition(opacity: animation, child: child);
+              },
+        ),
+      );
+    });
   }
 
   @override
@@ -127,6 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -137,8 +131,7 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _selectedIndex = 0;
 
-  final GlobalKey<_TodayPageState> _todayPageKey =
-      GlobalKey<_TodayPageState>();
+  final GlobalKey<_TodayPageState> _todayPageKey = GlobalKey<_TodayPageState>();
 
   late final List<Widget> _pages;
 
@@ -178,9 +171,7 @@ class _MainShellState extends State<MainShell> {
   Future<void> _openSettings() async {
     await Navigator.push<void>(
       context,
-      MaterialPageRoute<void>(
-        builder: (_) => const SettingsPage(),
-      ),
+      MaterialPageRoute<void>(builder: (_) => const SettingsPage()),
     );
 
     await _todayPageKey.currentState?.reloadPreferences();
@@ -204,10 +195,7 @@ class _MainShellState extends State<MainShell> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: _pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
@@ -260,6 +248,8 @@ class _TodayPageState extends State<TodayPage> {
   String? _displayName;
   bool _nameDialogScheduled = false;
   bool _nameDialogOpen = false;
+  bool _stateDialogScheduled = false;
+  bool _stateDialogOpen = false;
 
   @override
   void initState() {
@@ -269,12 +259,9 @@ class _TodayPageState extends State<TodayPage> {
   }
 
   Future<CatholicDay> _loadToday() async {
-    final String? stateCode =
-        await UserPreferencesService.loadStateCode();
+    final String? stateCode = await UserPreferencesService.loadStateCode();
 
-    return CatholicDayService(
-      stateCode: stateCode,
-    ).getToday();
+    return CatholicDayService(stateCode: stateCode).getToday();
   }
 
   Future<void> reloadPreferences() async {
@@ -289,9 +276,7 @@ class _TodayPageState extends State<TodayPage> {
     });
   }
 
-  Future<void> _loadName({
-    bool promptIfMissing = false,
-  }) async {
+  Future<void> _loadName({bool promptIfMissing = false}) async {
     final String? savedName = await UserPreferencesService.loadName();
     final bool hasPrompted = await UserPreferencesService.hasPromptedForName();
 
@@ -316,6 +301,12 @@ class _TodayPageState extends State<TodayPage> {
 
         _showFirstRunNameDialog();
       });
+
+      return;
+    }
+
+    if (promptIfMissing) {
+      await _maybePromptForState();
     }
   }
 
@@ -326,8 +317,9 @@ class _TodayPageState extends State<TodayPage> {
 
     _nameDialogOpen = true;
 
-    final TextEditingController controller =
-        TextEditingController(text: _displayName ?? '');
+    final TextEditingController controller = TextEditingController(
+      text: _displayName ?? '',
+    );
 
     final String? result = await showDialog<String>(
       context: context,
@@ -339,9 +331,7 @@ class _TodayPageState extends State<TodayPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'What should we call you?',
-              ),
+              const Text('What should we call you?'),
               const SizedBox(height: 14),
               TextField(
                 controller: controller,
@@ -353,21 +343,15 @@ class _TodayPageState extends State<TodayPage> {
                   border: OutlineInputBorder(),
                 ),
                 onSubmitted: (value) {
-                  Navigator.pop(
-                    dialogContext,
-                    value.trim(),
-                  );
+                  Navigator.pop(dialogContext, value.trim());
                 },
               ),
               const SizedBox(height: 10),
               Text(
                 'Your name is saved only on this device.',
-                style: Theme.of(dialogContext)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(
-                      color: Colors.black54,
-                    ),
+                style: Theme.of(
+                  dialogContext,
+                ).textTheme.bodySmall?.copyWith(color: Colors.black54),
               ),
             ],
           ),
@@ -380,10 +364,7 @@ class _TodayPageState extends State<TodayPage> {
             ),
             FilledButton(
               onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  controller.text.trim(),
-                );
+                Navigator.pop(dialogContext, controller.text.trim());
               },
               child: const Text('Save'),
             ),
@@ -402,7 +383,131 @@ class _TodayPageState extends State<TodayPage> {
       await UserPreferencesService.saveName(result);
     }
 
-  await _loadName();
+    await _loadName();
+    await _maybePromptForState();
+  }
+
+  Future<void> _maybePromptForState() async {
+    if (_stateDialogScheduled || _stateDialogOpen) {
+      return;
+    }
+
+    final bool hasPrompted = await UserPreferencesService.hasPromptedForState();
+
+    if (!mounted || hasPrompted) {
+      return;
+    }
+
+    _stateDialogScheduled = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+
+      _showFirstRunStateDialog();
+    });
+  }
+
+  Future<void> _showFirstRunStateDialog() async {
+    if (_stateDialogOpen) {
+      return;
+    }
+
+    _stateDialogOpen = true;
+    String? selectedStateCode;
+
+    final String? result = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Set your Liturgical Region'),
+              content: SizedBox(
+                width: 420,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('What state are you in?'),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Your state helps One Nation Faith apply regional '
+                      'Catholic calendar differences, such as the Ascension.',
+                    ),
+                    const SizedBox(height: 18),
+                    DropdownMenuFormField<String>(
+                      initialSelection: selectedStateCode,
+                      enableFilter: true,
+                      enableSearch: true,
+                      menuHeight: 320,
+                      expandedInsets: EdgeInsets.zero,
+                      label: const Text('State'),
+                      leadingIcon: const Icon(Icons.location_on_outlined),
+                      dropdownMenuEntries: usStateOptions
+                          .map(
+                            (UsStateOption state) => DropdownMenuEntry<String>(
+                              value: state.code,
+                              label: state.name,
+                            ),
+                          )
+                          .toList(),
+                      onSelected: (String? stateCode) {
+                        setDialogState(() {
+                          selectedStateCode = stateCode;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Your state is stored only on this device.',
+                      style: Theme.of(
+                        dialogContext,
+                      ).textTheme.bodySmall?.copyWith(color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext, '');
+                  },
+                  child: const Text('Use national default'),
+                ),
+                FilledButton(
+                  onPressed: selectedStateCode == null
+                      ? null
+                      : () {
+                          Navigator.pop(dialogContext, selectedStateCode);
+                        },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    _stateDialogOpen = false;
+    _stateDialogScheduled = false;
+
+    if (result == null || result.trim().isEmpty) {
+      await UserPreferencesService.useNationalDefault();
+    } else {
+      await UserPreferencesService.saveStateCode(result);
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _dayFuture = _loadToday();
+    });
   }
 
   @override
@@ -419,9 +524,7 @@ class _TodayPageState extends State<TodayPage> {
         future: _dayFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError || !snapshot.hasData) {
@@ -439,58 +542,43 @@ class _TodayPageState extends State<TodayPage> {
             children: [
               Text(
                 greetingText,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(
-                      color: OneNationFaithApp.navy,
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: OneNationFaithApp.navy,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               const SizedBox(height: 6),
               Text(
                 date,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(
-                      color: Colors.black54,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: Colors.black54),
               ),
               const SizedBox(height: 4),
               Text(
                 catholicDay.celebration,
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall
-                    ?.copyWith(
-                      color: OneNationFaithApp.burgundy,
-                      fontWeight: FontWeight.w700,
-                    ),
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: OneNationFaithApp.burgundy,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 '${catholicDay.seasonName} • '
                 '${catholicDay.colorName} • '
                 '${catholicDay.rosaryMysteriesName}',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(
-                      color: Colors.black54,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
               ),
               if (catholicDay.isHolyDayOfObligation) ...[
                 const SizedBox(height: 6),
                 Text(
                   'Holy Day of Obligation',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(
-                        color: OneNationFaithApp.burgundy,
-                        fontWeight: FontWeight.w700,
-                      ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: OneNationFaithApp.burgundy,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ],
               const SizedBox(height: 24),
@@ -525,8 +613,7 @@ class _TodayPageState extends State<TodayPage> {
               SectionCard(
                 icon: Icons.person_outline,
                 title: 'Saint of the Day',
-                subtitle:
-                    catholicDay.saintName ?? 'No saint listed today',
+                subtitle: catholicDay.saintName ?? 'No saint listed today',
                 body: catholicDay.saintName == null
                     ? 'Today follows the regular liturgical calendar.'
                     : 'Learn about ${catholicDay.saintName} and their witness to the faith.',
@@ -607,8 +694,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _loadPreferences() async {
     final String? savedName = await UserPreferencesService.loadName();
-    final String? savedStateCode =
-        await UserPreferencesService.loadStateCode();
+    final String? savedStateCode = await UserPreferencesService.loadStateCode();
 
     if (!mounted) {
       return;
@@ -637,9 +723,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Enter a name, or choose "Use Welcome instead".',
-          ),
+          content: Text('Enter a name, or choose "Use Welcome instead".'),
         ),
       );
       return;
@@ -688,11 +772,9 @@ class _SettingsPageState extends State<SettingsPage> {
       _isSaving = false;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Liturgical region saved.'),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Liturgical region saved.')));
   }
 
   Future<void> _clearStateCode() async {
@@ -714,9 +796,7 @@ class _SettingsPageState extends State<SettingsPage> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Using the national default calendar.'),
-      ),
+      const SnackBar(content: Text('Using the national default calendar.')),
     );
   }
 
@@ -730,25 +810,18 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(20),
               children: [
                 Text(
                   'Personal greeting',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(
-                        color: OneNationFaithApp.navy,
-                        fontWeight: FontWeight.w800,
-                      ),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: OneNationFaithApp.navy,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -780,25 +853,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(height: 12),
                 Text(
                   'This name is stored only on this device.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(
-                        color: Colors.black54,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.black54),
                 ),
                 const SizedBox(height: 32),
                 const Divider(),
                 const SizedBox(height: 24),
                 Text(
                   'Liturgical Region',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(
-                        color: OneNationFaithApp.navy,
-                        fontWeight: FontWeight.w800,
-                      ),
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    color: OneNationFaithApp.navy,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -833,13 +900,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 Text(
                   'Used for regional differences such as the Ascension. '
                   'Your state is stored only on this device.',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(
-                        color: Colors.black54,
-                        height: 1.4,
-                      ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.black54,
+                    height: 1.4,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextButton.icon(
@@ -864,10 +928,7 @@ class DailyHeroCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            OneNationFaithApp.navy,
-            Color(0xFF274E70),
-          ],
+          colors: [OneNationFaithApp.navy, Color(0xFF274E70)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -877,29 +938,29 @@ class DailyHeroCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-  '✝',
-  style: TextStyle(
-    color: OneNationFaithApp.gold,
-    fontSize: 42,
-    fontWeight: FontWeight.bold,
-  ),
-),
+            '✝',
+            style: TextStyle(
+              color: OneNationFaithApp.gold,
+              fontSize: 42,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 18),
           Text(
             'What does God have for me today?',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
-                ),
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              height: 1.2,
+            ),
           ),
           const SizedBox(height: 10),
           Text(
             'Take a quiet moment to listen, pray, learn, and live your faith.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.88),
-                  height: 1.5,
-                ),
+              color: Colors.white.withValues(alpha: 0.88),
+              height: 1.5,
+            ),
           ),
           const SizedBox(height: 22),
           FilledButton.icon(
@@ -948,10 +1009,7 @@ class SectionCard extends StatelessWidget {
                     color: OneNationFaithApp.gold.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(
-                    icon,
-                    color: OneNationFaithApp.navy,
-                  ),
+                  child: Icon(icon, color: OneNationFaithApp.navy),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -960,24 +1018,18 @@ class SectionCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(
-                              color: OneNationFaithApp.navy,
-                              fontWeight: FontWeight.w800,
-                            ),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: OneNationFaithApp.navy,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(
-                              color: OneNationFaithApp.burgundy,
-                              fontWeight: FontWeight.w700,
-                            ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: OneNationFaithApp.burgundy,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ],
                   ),
@@ -987,10 +1039,9 @@ class SectionCard extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               body,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(height: 1.5),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(height: 1.5),
             ),
             const SizedBox(height: 12),
             TextButton(
@@ -1018,25 +1069,21 @@ class InvitationCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(
-              Icons.favorite,
-              color: OneNationFaithApp.gold,
-            ),
+            const Icon(Icons.favorite, color: OneNationFaithApp.gold),
             const SizedBox(height: 12),
             Text(
               "Today's Invitation",
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Reach out to one person who may need encouragement today.',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.white,
-                    height: 1.5,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: Colors.white, height: 1.5),
             ),
           ],
         ),
@@ -1065,27 +1112,23 @@ class PlaceholderPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 72,
-              color: OneNationFaithApp.gold,
-            ),
+            Icon(icon, size: 72, color: OneNationFaithApp.gold),
             const SizedBox(height: 20),
             Text(
               title,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: OneNationFaithApp.navy,
-                    fontWeight: FontWeight.w800,
-                  ),
+                color: OneNationFaithApp.navy,
+                fontWeight: FontWeight.w800,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
               message,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.black54,
-                    height: 1.5,
-                  ),
+                color: Colors.black54,
+                height: 1.5,
+              ),
             ),
           ],
         ),
@@ -1093,9 +1136,3 @@ class PlaceholderPage extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
