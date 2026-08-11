@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'data/us_states.dart';
 import 'services/user_preferences_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/pray_screen.dart';
@@ -178,11 +179,11 @@ class _MainShellState extends State<MainShell> {
     await Navigator.push<void>(
       context,
       MaterialPageRoute<void>(
-        builder: (_) => const NameSettingsPage(),
+        builder: (_) => const SettingsPage(),
       ),
     );
 
-    await _todayPageKey.currentState?.reloadName();
+    await _todayPageKey.currentState?.reloadPreferences();
   }
 
   @override
@@ -254,8 +255,6 @@ class TodayPage extends StatefulWidget {
 }
 
 class _TodayPageState extends State<TodayPage> {
-  final CatholicDayService _service = const CatholicDayService();
-
   late Future<CatholicDay> _dayFuture;
 
   String? _displayName;
@@ -265,12 +264,29 @@ class _TodayPageState extends State<TodayPage> {
   @override
   void initState() {
     super.initState();
-    _dayFuture = _service.getToday();
+    _dayFuture = _loadToday();
     _loadName(promptIfMissing: true);
   }
 
-  Future<void> reloadName() async {
+  Future<CatholicDay> _loadToday() async {
+    final String? stateCode =
+        await UserPreferencesService.loadStateCode();
+
+    return CatholicDayService(
+      stateCode: stateCode,
+    ).getToday();
+  }
+
+  Future<void> reloadPreferences() async {
     await _loadName();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _dayFuture = _loadToday();
+    });
   }
 
   Future<void> _loadName({
@@ -386,7 +402,7 @@ class _TodayPageState extends State<TodayPage> {
       await UserPreferencesService.saveName(result);
     }
 
-    await reloadName();
+  await _loadName();
   }
 
   @override
@@ -568,35 +584,47 @@ class _TodayPageState extends State<TodayPage> {
   }
 }
 
-class NameSettingsPage extends StatefulWidget {
-  const NameSettingsPage({super.key});
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
 
   @override
-  State<NameSettingsPage> createState() =>
-      _NameSettingsPageState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _NameSettingsPageState extends State<NameSettingsPage> {
-  final TextEditingController _controller =
-      TextEditingController();
+class _SettingsPageState extends State<SettingsPage> {
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _stateController = TextEditingController();
 
   bool _isLoading = true;
   bool _isSaving = false;
+  String? _selectedStateCode;
 
   @override
   void initState() {
     super.initState();
-    _loadName();
+    _loadPreferences();
   }
 
-  Future<void> _loadName() async {
+  Future<void> _loadPreferences() async {
     final String? savedName = await UserPreferencesService.loadName();
+    final String? savedStateCode =
+        await UserPreferencesService.loadStateCode();
 
     if (!mounted) {
       return;
     }
 
-    _controller.text = savedName ?? '';
+    _nameController.text = savedName ?? '';
+    _selectedStateCode = savedStateCode;
+
+    if (savedStateCode != null) {
+      for (final UsStateOption state in usStateOptions) {
+        if (state.code == savedStateCode) {
+          _stateController.text = state.name;
+          break;
+        }
+      }
+    }
 
     setState(() {
       _isLoading = false;
@@ -604,13 +632,13 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
   }
 
   Future<void> _saveName() async {
-    final String name = _controller.text.trim();
+    final String name = _nameController.text.trim();
 
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Enter a name, or choose “Use Welcome instead.”',
+            'Enter a name, or choose â€œUse Welcome instead.â€',
           ),
         ),
       );
@@ -644,9 +672,58 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
     Navigator.pop(context);
   }
 
+  Future<void> _saveStateCode(String stateCode) async {
+    setState(() {
+      _isSaving = true;
+      _selectedStateCode = stateCode;
+    });
+
+    await UserPreferencesService.saveStateCode(stateCode);
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _isSaving = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Liturgical region saved.'),
+      ),
+    );
+  }
+
+  Future<void> _clearStateCode() async {
+    setState(() {
+      _isSaving = true;
+    });
+
+    await UserPreferencesService.clearStateCode();
+
+    if (!mounted) {
+      return;
+    }
+
+    _stateController.clear();
+
+    setState(() {
+      _selectedStateCode = null;
+      _isSaving = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Using the national default calendar.'),
+      ),
+    );
+  }
+
   @override
   void dispose() {
-    _controller.dispose();
+    _nameController.dispose();
+    _stateController.dispose();
     super.dispose();
   }
 
@@ -679,7 +756,7 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
                 ),
                 const SizedBox(height: 20),
                 TextField(
-                  controller: _controller,
+                  controller: _nameController,
                   enabled: !_isSaving,
                   textCapitalization: TextCapitalization.words,
                   textInputAction: TextInputAction.done,
@@ -700,7 +777,7 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
                   onPressed: _isSaving ? null : _removeName,
                   child: const Text('Use Welcome instead'),
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 12),
                 Text(
                   'This name is stored only on this device.',
                   style: Theme.of(context)
@@ -710,12 +787,73 @@ class _NameSettingsPageState extends State<NameSettingsPage> {
                         color: Colors.black54,
                       ),
                 ),
+                const SizedBox(height: 32),
+                const Divider(),
+                const SizedBox(height: 24),
+                Text(
+                  'Liturgical Region',
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(
+                        color: OneNationFaithApp.navy,
+                        fontWeight: FontWeight.w800,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Choose your state so One Nation Faith can apply regional Catholic calendar differences.',
+                ),
+                const SizedBox(height: 20),
+                DropdownMenuFormField<String>(
+                  controller: _stateController,
+                  initialSelection: _selectedStateCode,
+                  enabled: !_isSaving,
+                  enableFilter: true,
+                  enableSearch: true,
+                  menuHeight: 360,
+                  expandedInsets: EdgeInsets.zero,
+                  label: const Text('State'),
+                  leadingIcon: const Icon(Icons.location_on_outlined),
+                  dropdownMenuEntries: usStateOptions
+                      .map(
+                        (UsStateOption state) => DropdownMenuEntry<String>(
+                          value: state.code,
+                          label: state.name,
+                        ),
+                      )
+                      .toList(),
+                  onSelected: (String? stateCode) {
+                    if (stateCode != null && !_isSaving) {
+                      _saveStateCode(stateCode);
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Used for regional differences such as the Ascension. '
+                  'Your state is stored only on this device.',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(
+                        color: Colors.black54,
+                        height: 1.4,
+                      ),
+                ),
+                const SizedBox(height: 12),
+                TextButton.icon(
+                  onPressed: _isSaving || _selectedStateCode == null
+                      ? null
+                      : _clearStateCode,
+                  icon: const Icon(Icons.public_outlined),
+                  label: const Text('Use national default'),
+                ),
               ],
             ),
     );
   }
 }
-
 
 class DailyHeroCard extends StatelessWidget {
   const DailyHeroCard({super.key});
