@@ -321,7 +321,7 @@ class _TodayPageState extends State<TodayPage> {
       text: _displayName ?? '',
     );
 
-    final String? result = await showDialog<String>(
+    final DialogRoute<String> nameDialogRoute = DialogRoute<String>(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
@@ -372,6 +372,12 @@ class _TodayPageState extends State<TodayPage> {
         );
       },
     );
+    final String? result = await Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push<String>(nameDialogRoute);
+
+    await nameDialogRoute.completed;
 
     controller.dispose();
     _nameDialogOpen = false;
