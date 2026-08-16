@@ -4,6 +4,7 @@ import 'services/user_preferences_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/liturgical_day_summary.dart';
 import 'screens/pray_screen.dart';
+import 'screens/saint_detail_screen.dart';
 import 'screens/todays_readings_screen.dart';
 import 'services/catholic_day_service.dart';
 import 'models/catholic_day.dart';
@@ -592,15 +593,7 @@ class _TodayPageState extends State<TodayPage> {
                 buttonLabel: 'Pray Now',
               ),
               const SizedBox(height: 14),
-              SectionCard(
-                icon: Icons.person_outline,
-                title: 'Saint of the Day',
-                subtitle: catholicDay.saintName ?? 'No saint listed today',
-                body: catholicDay.saintName == null
-                    ? 'Today follows the regular liturgical calendar.'
-                    : 'Learn about ${catholicDay.saintName} and their witness to the faith.',
-                buttonLabel: 'Learn More',
-              ),
+              SaintOfDayCard(day: catholicDay),
               const SizedBox(height: 14),
               const InvitationCard(),
             ],
@@ -956,6 +949,38 @@ class DailyHeroCard extends StatelessWidget {
   }
 }
 
+class SaintOfDayCard extends StatelessWidget {
+  const SaintOfDayCard({super.key, required this.day});
+
+  final CatholicDay day;
+
+  @override
+  Widget build(BuildContext context) {
+    final String? saintName = day.saintName?.trim();
+    final bool hasSaint = saintName != null && saintName.isNotEmpty;
+
+    return SectionCard(
+      icon: Icons.person_outline,
+      title: 'Saint of the Day',
+      subtitle: hasSaint ? saintName : 'No saint listed today',
+      body: !hasSaint
+          ? 'Today follows the regular liturgical calendar.'
+          : 'Learn about $saintName and their witness to the faith.',
+      buttonLabel: 'Learn More',
+      onPressed: hasSaint
+          ? (context) {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (_) => SaintDetailScreen(saintName: saintName),
+                ),
+              );
+            }
+          : null,
+    );
+  }
+}
+
 class SectionCard extends StatelessWidget {
   const SectionCard({
     super.key,
@@ -1027,9 +1052,11 @@ class SectionCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             TextButton(
-              onPressed: () {
-                onPressed?.call(context);
-              },
+              onPressed: onPressed == null
+                  ? null
+                  : () {
+                      onPressed!(context);
+                    },
               child: Text(buttonLabel),
             ),
           ],
