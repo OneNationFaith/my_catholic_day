@@ -22,8 +22,8 @@ class LiturgicalDaySummary extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '${day.seasonName} â€¢ '
-          '${day.colorName} â€¢ '
+          '${day.seasonName} • '
+          '${day.colorName} • '
           '${day.rosaryMysteriesName}',
           style: Theme.of(
             context,

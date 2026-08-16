@@ -32,7 +32,7 @@ void main() {
 
         expect(find.text('Ascension'), findsOneWidget);
         expect(
-          find.text('Easter â€¢ White â€¢ Luminous Mysteries'),
+          find.text('Easter • White • Luminous Mysteries'),
           findsOneWidget,
         );
         expect(find.text('Holy Day of Obligation'), findsOneWidget);
