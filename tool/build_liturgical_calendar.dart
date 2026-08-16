@@ -187,35 +187,56 @@ Future<void> main(List<String> arguments) async {
             }
           : null;
 
+      final Map<String, dynamic>? usccb2027WeekdayOverride =
+          date == '2027-06-05'
+          ? <String, dynamic>{
+              'event_key': 'ONF_USCCB_2027_06_05_WEEKDAY',
+              'name': 'Saturday of the Ninth Week in Ordinary Time',
+              'color': <String>['green'],
+              'color_lcl': <String>['green'],
+              'grade': 0,
+              'grade_lcl': 'weekday',
+              'grade_abbr': 'w',
+              'grade_display': null,
+              'common': <String>[],
+              'common_lcl': '',
+              'type': 'generated',
+              'year': 2027,
+              'month': 6,
+              'day': 5,
+              'day_of_the_week_iso8601': 6,
+              'day_of_the_week_short': 'Sat',
+              'day_of_the_week_long': 'Saturday',
+              'liturgical_year': 'YEAR I',
+              'psalter_week': 1,
+              'liturgical_season': 'ORDINARY_TIME',
+              'liturgical_season_lcl': 'Ordinary Time',
+              'source': 'USCCB 2027 calendar normalization',
+            }
+          : null;
       final Map<String, dynamic>? underlyingWeekday =
           _firstEventWhere(
             nonVigilEvents,
             (Map<String, dynamic> event) => _integerValue(event['grade']) == 0,
           ) ??
-          usccbWeekdayOverride;
-
+          usccbWeekdayOverride ??
+          usccb2027WeekdayOverride;
       final List<Map<String, dynamic>> holyDayObligationOverrides =
           <Map<String, dynamic>>[];
 
-      if (year == 2026) {
-        for (final Map<String, dynamic> event in events) {
-          final String eventKey = event['event_key']?.toString() ?? '';
+      for (final Map<String, dynamic> event in events) {
+        final String eventKey = event['event_key']?.toString() ?? '';
 
-          final bool isAbrogatedAssumption =
-              (date == '2026-08-14' && eventKey == 'Assumption_vigil') ||
-              (date == '2026-08-15' && eventKey == 'Assumption');
+        if (_isUsHolyDayObligationAbrogated(year: year, eventKey: eventKey)) {
+          final Map<String, dynamic> normalizedEvent =
+              Map<String, dynamic>.from(event)
+                ..['holy_day_of_obligation'] = false
+                ..['source'] =
+                    'USCCB Canon 1246 \u00A72 obligation normalization';
 
-          if (isAbrogatedAssumption) {
-            final Map<String, dynamic> normalizedEvent =
-                Map<String, dynamic>.from(event)
-                  ..['holy_day_of_obligation'] = false
-                  ..['source'] = 'USCCB Canon 1246 §2 obligation normalization';
-
-            holyDayObligationOverrides.add(normalizedEvent);
-          }
+          holyDayObligationOverrides.add(normalizedEvent);
         }
       }
-
       final List<Map<String, dynamic>> generatedEvents =
           <Map<String, dynamic>>[];
 
@@ -246,6 +267,61 @@ Future<void> main(List<String> arguments) async {
         });
       }
 
+      if (date == '2027-06-05') {
+        generatedEvents.add(<String, dynamic>{
+          'event_key': 'ONF_USCCB_2027_06_05_BVM',
+          'name': 'Saturday Memorial of the Blessed Virgin Mary',
+          'color': <String>['white'],
+          'color_lcl': <String>['white'],
+          'grade': 2,
+          'grade_lcl': 'optional memorial',
+          'grade_abbr': 'm',
+          'grade_display': null,
+          'common': <String>['Blessed Virgin Mary'],
+          'common_lcl': 'From the Common of the Blessed Virgin Mary',
+          'type': 'generated',
+          'year': 2027,
+          'month': 6,
+          'day': 5,
+          'day_of_the_week_iso8601': 6,
+          'day_of_the_week_short': 'Sat',
+          'day_of_the_week_long': 'Saturday',
+          'liturgical_year': 'YEAR I',
+          'psalter_week': 1,
+          'liturgical_season': 'ORDINARY_TIME',
+          'liturgical_season_lcl': 'Ordinary Time',
+          'source': 'USCCB 2027 calendar normalization',
+        });
+      }
+
+      if (date == '2027-10-09') {
+        generatedEvents.add(<String, dynamic>{
+          'event_key': 'ONF_USCCB_2027_10_09_ST_JOHN_HENRY_NEWMAN',
+          'name': 'Saint John Henry Newman, Priest and Doctor of the Church',
+          'color': <String>['white'],
+          'color_lcl': <String>['white'],
+          'grade': 2,
+          'grade_lcl': 'optional memorial',
+          'grade_abbr': 'm',
+          'grade_display': null,
+          'common': <String>[],
+          'common_lcl':
+              'From the Common of Pastors: For One Pastor; '
+              'or From the Common of Doctors of the Church',
+          'type': 'generated',
+          'year': 2027,
+          'month': 10,
+          'day': 9,
+          'day_of_the_week_iso8601': 6,
+          'day_of_the_week_short': 'Sat',
+          'day_of_the_week_long': 'Saturday',
+          'liturgical_year': 'YEAR I',
+          'psalter_week': 3,
+          'liturgical_season': 'ORDINARY_TIME',
+          'liturgical_season_lcl': 'Ordinary Time',
+          'source': 'USCCB 2027 calendar normalization',
+        });
+      }
       final List<Map<String, dynamic>> optionalMemorials =
           <Map<String, dynamic>>[
             ...nonVigilEvents.where((Map<String, dynamic> event) {
@@ -290,6 +366,7 @@ Future<void> main(List<String> arguments) async {
         'underlyingWeekdayKey': underlyingWeekday?['event_key'],
         'normalizedEvents': <Map<String, dynamic>>[
           ?usccbWeekdayOverride,
+          ?usccb2027WeekdayOverride,
           ...holyDayObligationOverrides,
           ...generatedEvents,
         ],
@@ -598,6 +675,37 @@ Map<String, dynamic>? _firstEventWhere(
   }
 
   return null;
+}
+
+bool _isUsHolyDayObligationAbrogated({
+  required int year,
+  required String eventKey,
+}) {
+  final String baseEventKey = eventKey.endsWith('_vigil')
+      ? eventKey.substring(0, eventKey.length - '_vigil'.length)
+      : eventKey;
+
+  final int month;
+  final int day;
+
+  switch (baseEventKey) {
+    case 'MaryMotherOfGod':
+      month = 1;
+      day = 1;
+    case 'Assumption':
+      month = 8;
+      day = 15;
+    case 'AllSaints':
+      month = 11;
+      day = 1;
+    default:
+      return false;
+  }
+
+  final DateTime solemnityDate = DateTime(year, month, day);
+
+  return solemnityDate.weekday == DateTime.saturday ||
+      solemnityDate.weekday == DateTime.monday;
 }
 
 bool _isUsSpecialObservance(String? eventKey) {
