@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'data/repositories/saint_repository.dart';
 import 'data/us_states.dart';
+import 'models/saint.dart';
 import 'services/user_preferences_service.dart';
 import 'theme/app_theme.dart';
 import 'widgets/liturgical_day_summary.dart';
@@ -593,7 +595,7 @@ class _TodayPageState extends State<TodayPage> {
                 buttonLabel: 'Pray Now',
               ),
               const SizedBox(height: 14),
-              SaintOfDayCard(day: catholicDay),
+              SaintOfDayCard(date: catholicDay.date),
               const SizedBox(height: 14),
               const InvitationCard(),
             ],
@@ -949,34 +951,146 @@ class DailyHeroCard extends StatelessWidget {
   }
 }
 
-class SaintOfDayCard extends StatelessWidget {
-  const SaintOfDayCard({super.key, required this.day});
+class SaintOfDayCard extends StatefulWidget {
+  const SaintOfDayCard({super.key, required this.date, this.repository});
 
-  final CatholicDay day;
+  static final SaintRepository _defaultRepository = SaintRepository();
+
+  final DateTime date;
+  final SaintRepository? repository;
+
+  @override
+  State<SaintOfDayCard> createState() => _SaintOfDayCardState();
+}
+
+class _SaintOfDayCardState extends State<SaintOfDayCard> {
+  late Future<List<Saint>> _saintsFuture;
+
+  SaintRepository get _repository =>
+      widget.repository ?? SaintOfDayCard._defaultRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _saintsFuture = _loadSaints();
+  }
+
+  @override
+  void didUpdateWidget(covariant SaintOfDayCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.date.month != widget.date.month ||
+        oldWidget.date.day != widget.date.day ||
+        oldWidget.repository != widget.repository) {
+      _saintsFuture = _loadSaints();
+    }
+  }
+
+  Future<List<Saint>> _loadSaints() {
+    return _repository.getByFeastDate(
+      month: widget.date.month,
+      day: widget.date.day,
+    );
+  }
+
+  void _openDetail(Saint saint) {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => SaintDetailScreen(saintName: saint.displayName),
+      ),
+    );
+  }
+
+  Future<void> _chooseSaint(List<Saint> saints) async {
+    if (saints.length == 1) {
+      _openDetail(saints.single);
+      return;
+    }
+
+    final Saint? selectedSaint = await showDialog<Saint>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return SimpleDialog(
+          title: const Text('Choose a Saint'),
+          children: saints
+              .map(
+                (Saint saint) => SimpleDialogOption(
+                  onPressed: () {
+                    Navigator.pop(dialogContext, saint);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(saint.displayName),
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+
+    if (!mounted || selectedSaint == null) {
+      return;
+    }
+
+    _openDetail(selectedSaint);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final String? saintName = day.saintName?.trim();
-    final bool hasSaint = saintName != null && saintName.isNotEmpty;
+    return FutureBuilder<List<Saint>>(
+      future: _saintsFuture,
+      builder: (BuildContext context, AsyncSnapshot<List<Saint>> snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const SectionCard(
+            icon: Icons.person_outline,
+            title: 'Saint of the Day',
+            subtitle: 'Loading saint information',
+            body: 'Loading devotional saint information for this date.',
+            buttonLabel: 'Learn More',
+          );
+        }
 
-    return SectionCard(
-      icon: Icons.person_outline,
-      title: 'Saint of the Day',
-      subtitle: hasSaint ? saintName : 'No saint listed today',
-      body: !hasSaint
-          ? 'Today follows the regular liturgical calendar.'
-          : 'Learn about $saintName and their witness to the faith.',
-      buttonLabel: 'Learn More',
-      onPressed: hasSaint
-          ? (context) {
-              Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => SaintDetailScreen(saintName: saintName),
-                ),
-              );
-            }
-          : null,
+        if (snapshot.hasError) {
+          return const SectionCard(
+            icon: Icons.person_outline,
+            title: 'Saint of the Day',
+            subtitle: 'Unable to load saint information',
+            body: 'Saint information is temporarily unavailable.',
+            buttonLabel: 'Learn More',
+          );
+        }
+
+        final List<Saint> saints = snapshot.data ?? const <Saint>[];
+
+        if (saints.isEmpty) {
+          return const SectionCard(
+            icon: Icons.person_outline,
+            title: 'Saint of the Day',
+            subtitle: 'No saint listed today',
+            body: 'No devotional saint record is available for this date.',
+            buttonLabel: 'Learn More',
+          );
+        }
+
+        final bool hasMultipleSaints = saints.length > 1;
+
+        return SectionCard(
+          icon: Icons.person_outline,
+          title: 'Saint of the Day',
+          subtitle: hasMultipleSaints
+              ? '${saints.length} saints listed today'
+              : saints.single.displayName,
+          body: hasMultipleSaints
+              ? 'Choose a saint to learn more about their witness to the faith.'
+              : 'Learn about ${saints.single.displayName} and their witness to the faith.',
+          buttonLabel: 'Learn More',
+          onPressed: (_) {
+            _chooseSaint(saints);
+          },
+        );
+      },
     );
   }
 }
