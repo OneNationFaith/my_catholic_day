@@ -80,6 +80,29 @@ void main() {
       expect(saint.shortReflection, isNull);
       expect(saint.prayer, isNull);
     });
+
+    test('accepts February 29 as a recurring feast date', () {
+      final Saint saint = Saint.fromJson(
+        _minimalSaintJson(feastMonth: 2, feastDay: 29),
+      );
+
+      expect(saint.feastMonth, 2);
+      expect(saint.feastDay, 29);
+    });
+
+    test('rejects February 30 as an invalid feast date', () {
+      expect(
+        () => Saint.fromJson(_minimalSaintJson(feastMonth: 2, feastDay: 30)),
+        throwsFormatException,
+      );
+    });
+
+    test('rejects April 31 as an invalid feast date', () {
+      expect(
+        () => Saint.fromJson(_minimalSaintJson(feastMonth: 4, feastDay: 31)),
+        throwsFormatException,
+      );
+    });
   });
 
   group('SaintRepository', () {
@@ -104,5 +127,98 @@ void main() {
 
       expect(saint, isNull);
     });
+
+    test('returns the bundled saint for January 4', () async {
+      final List<Saint> saints = await repository.getByFeastDate(
+        month: 1,
+        day: 4,
+      );
+
+      expect(saints.map((Saint saint) => saint.id), <String>[
+        'elizabeth-ann-seton',
+      ]);
+    });
+
+    test('returns an empty list when no bundled saint matches', () async {
+      final List<Saint> saints = await repository.getByFeastDate(
+        month: 2,
+        day: 1,
+      );
+
+      expect(saints, isEmpty);
+    });
+
+    test('returns every saint sharing the same feast date', () async {
+      final SaintRepository multipleSaintRepository =
+          _TestSaintRepository(<Saint>[
+            _testSaint(id: 'first-saint', feastMonth: 5, feastDay: 12),
+            _testSaint(id: 'second-saint', feastMonth: 5, feastDay: 12),
+            _testSaint(id: 'different-date', feastMonth: 5, feastDay: 13),
+          ]);
+
+      final List<Saint> saints = await multipleSaintRepository.getByFeastDate(
+        month: 5,
+        day: 12,
+      );
+
+      expect(saints.map((Saint saint) => saint.id), <String>[
+        'first-saint',
+        'second-saint',
+      ]);
+    });
+
+    test('rejects invalid feast dates', () async {
+      await expectLater(
+        repository.getByFeastDate(month: 13, day: 1),
+        throwsRangeError,
+      );
+      await expectLater(
+        repository.getByFeastDate(month: 2, day: 30),
+        throwsRangeError,
+      );
+    });
   });
+}
+
+Map<String, dynamic> _minimalSaintJson({
+  required int feastMonth,
+  required int feastDay,
+}) {
+  return <String, dynamic>{
+    'id': 'date-validation-saint',
+    'displayName': 'Date Validation Saint',
+    'feast': <String, dynamic>{'month': feastMonth, 'day': feastDay},
+    'shortBiography': 'Test biography.',
+    'patronages': <String>[],
+    'sources': <Map<String, dynamic>>[
+      <String, dynamic>{'label': 'Test source'},
+    ],
+  };
+}
+
+Saint _testSaint({
+  required String id,
+  required int feastMonth,
+  required int feastDay,
+}) {
+  return Saint(
+    id: id,
+    displayName: 'Test Saint',
+    feastMonth: feastMonth,
+    feastDay: feastDay,
+    shortBiography: 'Test biography.',
+    patronages: const <String>[],
+    sources: const <SaintSourceReference>[
+      SaintSourceReference(label: 'Test source'),
+    ],
+  );
+}
+
+class _TestSaintRepository extends SaintRepository {
+  _TestSaintRepository(this.saints);
+
+  final List<Saint> saints;
+
+  @override
+  Future<List<Saint>> getAll() async => saints;
 }

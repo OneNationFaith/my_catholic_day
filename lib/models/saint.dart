@@ -36,8 +36,10 @@ class Saint {
       throw FormatException('Invalid saint feast month: $feastMonth.');
     }
 
-    if (feastDay < 1 || feastDay > 31) {
-      throw FormatException('Invalid saint feast day: $feastDay.');
+    final int daysInMonth = DateTime(2000, feastMonth + 1, 0).day;
+
+    if (feastDay < 1 || feastDay > daysInMonth) {
+      throw FormatException('Invalid saint feast date: $feastMonth/$feastDay.');
     }
 
     return Saint(

@@ -27,6 +27,21 @@ class SaintRepository {
     return saintsById[normalizedId];
   }
 
+  Future<List<Saint>> getByFeastDate({
+    required int month,
+    required int day,
+  }) async {
+    _validateFeastDate(month: month, day: day);
+
+    final List<Saint> saints = await getAll();
+
+    return List<Saint>.unmodifiable(
+      saints.where(
+        (Saint saint) => saint.feastMonth == month && saint.feastDay == day,
+      ),
+    );
+  }
+
   Future<Map<String, Saint>> _loadSaintsById() {
     return _saintsByIdFuture ??= _readSaintsById();
   }
@@ -72,5 +87,17 @@ class SaintRepository {
     }
 
     return Map<String, Saint>.unmodifiable(saintsById);
+  }
+
+  void _validateFeastDate({required int month, required int day}) {
+    if (month < 1 || month > 12) {
+      throw RangeError.range(month, 1, 12, 'month');
+    }
+
+    final int daysInMonth = DateTime(2000, month + 1, 0).day;
+
+    if (day < 1 || day > daysInMonth) {
+      throw RangeError.range(day, 1, daysInMonth, 'day');
+    }
   }
 }
