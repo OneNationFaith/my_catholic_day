@@ -1,6 +1,7 @@
 import '../data/fixed_liturgical_celebrations.dart';
 import '../data/liturgical_calendar_repository.dart';
 import '../models/catholic_day.dart';
+import 'liturgical_title_formatter.dart';
 
 class CatholicDayService {
   const CatholicDayService({
@@ -37,7 +38,7 @@ class CatholicDayService {
       date: resolved.date,
       season: _seasonFromEvent(event),
       color: _colorFromEvent(event),
-      celebration: _displayName(event['name']?.toString()),
+      celebration: LiturgicalTitleFormatter.formatEvent(event),
       rank: _rankFromEvent(event),
       rosaryMysteries: _rosaryFor(resolved.date),
       saintName: _saintNameFor(resolved),
@@ -159,7 +160,7 @@ class CatholicDayService {
   }
 
   String? _saintLikeName(Map<String, dynamic> event) {
-    final String name = _displayName(event['name']?.toString());
+    final String name = LiturgicalTitleFormatter.formatEvent(event);
 
     final bool isSaintLike =
         name.startsWith('Saint ') ||
@@ -168,16 +169,6 @@ class CatholicDayService {
         name.startsWith('Blessed Virgin Mary');
 
     return isSaintLike ? name : null;
-  }
-
-  String _displayName(String? rawName) {
-    final String name = rawName?.trim() ?? '';
-
-    if (name.isEmpty) {
-      return 'Liturgical Day';
-    }
-
-    return name.replaceFirst(RegExp(r'^\[\s*USA?\s*\]\s*'), '').trim();
   }
 
   int? _integerValue(Object? value) {

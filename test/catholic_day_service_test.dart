@@ -6,6 +6,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('CatholicDayService 2026 calendar-to-model mapping', () {
+    test('normalizes raw Christmas weekday wording for the Today UI', () async {
+      const CatholicDayService service = CatholicDayService();
+
+      final CatholicDay day = await service.getForDate(DateTime(2026, 1, 3));
+
+      expect(day.celebration, 'Saturday of Christmas Time');
+      expect(day.season, LiturgicalSeason.christmas);
+    });
     test('maps New York Ascension Thursday for the Today UI model', () async {
       const CatholicDayService service = CatholicDayService(stateCode: 'NY');
 
