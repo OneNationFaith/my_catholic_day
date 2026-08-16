@@ -108,7 +108,7 @@ void main() {
   group('SaintRepository', () {
     final SaintRepository repository = SaintRepository();
 
-    test('loads the bundled sample saint by stable ID', () async {
+    test('loads the bundled saint profile by stable ID', () async {
       final Saint? saint = await repository.getById('elizabeth-ann-seton');
 
       expect(saint, isNotNull);
@@ -116,10 +116,23 @@ void main() {
       expect(saint.displayName, 'Saint Elizabeth Ann Seton');
       expect(saint.feastMonth, 1);
       expect(saint.feastDay, 4);
-      expect(saint.shortBiography, startsWith('TEMPORARY SAMPLE CONTENT:'));
-      expect(saint.patronages, isEmpty);
-      expect(saint.sources, hasLength(1));
-      expect(saint.sources.single.attribution, contains('sample data'));
+      expect(
+        saint.shortBiography,
+        startsWith('Elizabeth Ann Bayley Seton was born'),
+      );
+      expect(saint.patronages, <String>[
+        'Catholic schools',
+        'Sea Services personnel and families',
+      ]);
+      expect(saint.sources, hasLength(3));
+      expect(
+        saint.sources.map((SaintSourceReference source) => source.publisher),
+        <String>[
+          'United States Conference of Catholic Bishops',
+          'National Shrine of Saint Elizabeth Ann Seton',
+          'The Holy See',
+        ],
+      );
     });
 
     test('returns null for an unknown stable ID', () async {

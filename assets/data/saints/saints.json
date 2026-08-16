@@ -8,13 +8,39 @@
         "month": 1,
         "day": 4
       },
-      "shortBiography": "TEMPORARY SAMPLE CONTENT: A reviewed biography will be added after an approved saint-content source is selected.",
-      "patronages": [],
+      "saintType": "Religious, Foundress",
+      "shortBiography": "Elizabeth Ann Bayley Seton was born in New York City on August 28, 1774. She married William Magee Seton in 1794, and they had five children. After William died in Italy in 1803, Elizabeth’s encounter with Catholicism—especially her growing devotion to the Eucharist—led her to enter the Catholic Church in 1805. In 1809 she moved to Emmitsburg, Maryland, where she founded the Sisters of Charity of St. Joseph’s and began St. Joseph’s School, helping lay foundations for Catholic education in the United States. She died on January 4, 1821. Pope Paul VI canonized her on September 14, 1975, making her the first native-born citizen of the United States to be canonized a saint.",
+      "patronages": [
+        "Catholic schools",
+        "Sea Services personnel and families"
+      ],
+      "birthInformation": {
+        "date": "August 28, 1774",
+        "place": "New York City, New York"
+      },
+      "deathInformation": {
+        "date": "January 4, 1821"
+      },
+      "shortReflection": "Saint Elizabeth Ann Seton’s life shows that holiness can grow through ordinary duties, loss, uncertainty, and courageous trust in God. Her devotion to the Eucharist transformed her search for truth into a life of service, education, and charity. When life changes unexpectedly, her example invites us to keep seeking Christ faithfully and to serve the people God places before us.",
+      "prayer": "Saint Elizabeth Ann Seton, you followed God through marriage, motherhood, widowhood, conversion, and religious life. Pray that I may seek Christ with courage, love the Eucharist deeply, and serve others faithfully in whatever vocation God gives me. Help me trust God when the path ahead is uncertain. Amen.",
       "sources": [
         {
-          "label": "Temporary development placeholder",
-          "attribution": "One Nation Faith sample data; replace with reviewed source attribution before release.",
-          "notes": "This placeholder does not provide or support detailed historical claims."
+          "label": "U.S. Saints and Blesseds — Saint Elizabeth Ann Seton",
+          "publisher": "United States Conference of Catholic Bishops",
+          "url": "https://www.usccb.org/committees/evangelization-catechesis/us-saints-and-blesseds",
+          "notes": "Used to verify feast day, vocation, family, conversion, and role in Catholic education."
+        },
+        {
+          "label": "The Life of Saint Elizabeth Ann Seton",
+          "publisher": "National Shrine of Saint Elizabeth Ann Seton",
+          "url": "https://setonshrine.org/elizabeth-ann-seton/",
+          "notes": "Used to verify biographical chronology, founding work, and canonization history."
+        },
+        {
+          "label": "Canonization of Elizabeth Ann Seton",
+          "publisher": "The Holy See",
+          "url": "https://www.vatican.va/content/paul-vi/en/homilies/1975/documents/hf_p-vi_hom_19750914.html",
+          "notes": "Used to verify her canonization by Pope Paul VI on September 14, 1975."
         }
       ]
     }
