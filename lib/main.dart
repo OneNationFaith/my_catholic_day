@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'data/us_states.dart';
 import 'services/user_preferences_service.dart';
 import 'theme/app_theme.dart';
+import 'widgets/liturgical_day_summary.dart';
 import 'screens/pray_screen.dart';
 import 'screens/todays_readings_screen.dart';
 import 'services/catholic_day_service.dart';
@@ -561,32 +562,7 @@ class _TodayPageState extends State<TodayPage> {
                 ).textTheme.titleMedium?.copyWith(color: Colors.black54),
               ),
               const SizedBox(height: 4),
-              Text(
-                catholicDay.celebration,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: OneNationFaithApp.burgundy,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '${catholicDay.seasonName} • '
-                '${catholicDay.colorName} • '
-                '${catholicDay.rosaryMysteriesName}',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
-              ),
-              if (catholicDay.isHolyDayOfObligation) ...[
-                const SizedBox(height: 6),
-                Text(
-                  'Holy Day of Obligation',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: OneNationFaithApp.burgundy,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
+              LiturgicalDaySummary(day: catholicDay),
               const SizedBox(height: 24),
               const DailyHeroCard(),
               const SizedBox(height: 18),
