@@ -50,8 +50,12 @@ void main() {
   testWidgets('uses the supplied date and opens the single saint', (
     WidgetTester tester,
   ) async {
+    final Saint saint = _testSaint(
+      'elizabeth-ann-seton',
+      'Saint Elizabeth Ann Seton',
+    );
     final _TestSaintRepository repository = await pumpCard(tester, <Saint>[
-      _testSaint('elizabeth-ann-seton', 'Saint Elizabeth Ann Seton'),
+      saint,
     ], date: DateTime(2035, 1, 4));
 
     expect(find.text('Saint Elizabeth Ann Seton'), findsOneWidget);
@@ -68,15 +72,19 @@ void main() {
 
     expect(find.byType(SaintDetailScreen), findsOneWidget);
     expect(find.text('Saint Elizabeth Ann Seton'), findsOneWidget);
+    expect(
+      tester.widget<SaintDetailScreen>(find.byType(SaintDetailScreen)).saint,
+      same(saint),
+    );
   });
 
   testWidgets('offers every matching saint for selection', (
     WidgetTester tester,
   ) async {
-    await pumpCard(tester, <Saint>[
-      _testSaint('first-saint', 'First Saint'),
-      _testSaint('second-saint', 'Second Saint'),
-    ]);
+    final Saint firstSaint = _testSaint('first-saint', 'First Saint');
+    final Saint secondSaint = _testSaint('second-saint', 'Second Saint');
+
+    await pumpCard(tester, <Saint>[firstSaint, secondSaint]);
 
     expect(find.text('2 saints listed today'), findsOneWidget);
 
@@ -92,6 +100,10 @@ void main() {
 
     expect(find.byType(SaintDetailScreen), findsOneWidget);
     expect(find.text('Second Saint'), findsOneWidget);
+    expect(
+      tester.widget<SaintDetailScreen>(find.byType(SaintDetailScreen)).saint,
+      same(secondSaint),
+    );
   });
 
   testWidgets('keeps repository errors inside the saint card', (

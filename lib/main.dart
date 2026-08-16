@@ -996,9 +996,7 @@ class _SaintOfDayCardState extends State<SaintOfDayCard> {
   void _openDetail(Saint saint) {
     Navigator.push(
       context,
-      MaterialPageRoute<void>(
-        builder: (_) => SaintDetailScreen(saintName: saint.displayName),
-      ),
+      MaterialPageRoute<void>(builder: (_) => SaintDetailScreen(saint: saint)),
     );
   }
 
