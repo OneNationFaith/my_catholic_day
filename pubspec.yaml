@@ -50,5 +50,6 @@ flutter:
     - assets/databases/dra.db
     - assets/data/lectionary/
     - assets/data/liturgical_calendar/
+    - assets/data/saints/
     - assets/images/onf_logo.png
 

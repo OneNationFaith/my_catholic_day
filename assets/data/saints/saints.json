@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "saints": [
+    {
+      "id": "elizabeth-ann-seton",
+      "displayName": "Saint Elizabeth Ann Seton",
+      "feast": {
+        "month": 1,
+        "day": 4
+      },
+      "shortBiography": "TEMPORARY SAMPLE CONTENT: A reviewed biography will be added after an approved saint-content source is selected.",
+      "patronages": [],
+      "sources": [
+        {
+          "label": "Temporary development placeholder",
+          "attribution": "One Nation Faith sample data; replace with reviewed source attribution before release.",
+          "notes": "This placeholder does not provide or support detailed historical claims."
+        }
+      ]
+    }
+  ]
+}
